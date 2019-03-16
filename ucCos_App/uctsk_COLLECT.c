@@ -185,7 +185,7 @@ static void vHandler_collect(void)
 	{
 		case Newton:
 			distemp = strDisSta * Result_adcVal;
-			Input.RegS.StrDisplay = distemp / Input.RegS.FullScaleAD;
+			Input.RegS.Strong = distemp / Input.RegS.FullScaleAD;
 			break;
 		
 		case cNewton:
