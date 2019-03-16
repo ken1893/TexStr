@@ -173,8 +173,11 @@ static void vHandler_collect(void)
 				}
 				else 
 				{
-					Action_Flag = EXAM_2;            // 停止			
+					Action_Flag = EXAM_2;            // 停止		
+					
+					// 拉停长度 (伸长)
 					TexMove = allmove;               // 拉断伸长，recorde 脉冲数，记录测试伸长量,用于计算
+					Input.RegS.Length = LEAD * TexMove * 100 / Holding.RegS.StepLong;      // 伸长
 				}
 			}
 		}

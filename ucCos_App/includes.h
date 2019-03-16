@@ -59,8 +59,8 @@
 #define ACTFRE	      0x0000 
 #define ADD_TARGET		0x0026       // 目标调光深度
 
-
-#define difMax      360
+#define LEAD        5 
+#define difMax      100       // 容差
 #define PWMCORECLK  36000000
 
 

@@ -1,23 +1,17 @@
-/****************************************Copyright (c)****************************************************
-**                                      
-**                                 http://www.powermcu.com
-**
+/****************************************Copyright (c)****************************************************                                    
+**                                 http://www.pgcc.top
 **--------------File Info---------------------------------------------------------------------------------
 ** File name:               uctsk_Blink.c
-** Descriptions:            The uctsk_Blink application function
-**
+** Descriptions:            The moving_Blink application function
 **--------------------------------------------------------------------------------------------------------
-** Created by:              AVRman
-** Created date:            2010-11-9
-** Version:                 v1.0
-** Descriptions:            The original version
-**
+** Created by:              ken
+** Created date:            2019-3-9
+** Version:                 v2.0
 **--------------------------------------------------------------------------------------------------------
 ** Modified by:             
 ** Modified date:           
 ** Version:                 
 ** Descriptions:            
-**
 *********************************************************************************************************/
 
 /* Includes ------------------------------------------------------------------*/
@@ -33,13 +27,12 @@ static  OS_STK         App_TaskBlinkStk[APP_TASK_BLINK_STK_SIZE];
 static void uctsk_Blink            (void);	  // Task
 
 static void LED_GPIO_Configuration (void);	  // LED显示IO初始化
-
 static void PWM_GPIO_Configuration(void);     // 脉冲输出IO初始化
 static void Tim3_Configuration(void);         // 时钟3初始化 PA6  TIM3_CH1
-//static void Tim5_Configuration(void);         // TIM5_CH2
+//static void Tim5_Configuration(void);       // TIM5_CH2
 static void UART1_Configuration(INT32U baud_rate);		  //  
-extern void  RxIntEn (void);
 
+extern void RxIntEn (void);
 void RunProcess(unsigned long AllRunStep,unsigned char StepW);
 
 void  App_BlinkTaskCreate (void)
@@ -76,8 +69,6 @@ static void uctsk_Blink (void)
 	Tim3_Configuration();
 	UART1_Configuration(57600);
 	
-	
-		
    	for(;;)
    	{
 			if(led_state)
