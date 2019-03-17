@@ -76,18 +76,15 @@ static  void    uctsk_COLLECT(void *pdata)
   #endif 
 	
 	Holding.RegS.Unit = Newton;     // 
-	Holding.RegS.Standard = 2;      // 2kg
 	
 	strDisSta = calcStand(Holding.RegS.Standard);    // 计算校准力值对应计算值
 
 	GuanTimes_Cache = Holding.RegS.GuanTimes;
 	
-	//Holding.RegS.StepLong  = 3200;    // 细分默认1600
-	Holding.RegS.Lead      = 5;       // 导程
 	Holding.RegS.CycleNum  = 100;     // 距离
 	
 	// 计算夹持长度对应电机运行步数
-	ZeroMove = (Holding.RegS.CycleNum / Holding.RegS.Lead) * Holding.RegS.StepLong * 2;
+	ZeroMove = (Holding.RegS.CycleNum / LEAD) * Holding.RegS.StepLong * 2;
 	
 	//Holding.RegS.FreS      = 20;      // 回零速度
 	//Holding.RegS.FreH9     = 20;      // 测试速度
@@ -104,7 +101,7 @@ static  void    uctsk_COLLECT(void *pdata)
 			I2C_Write(I2C1,ADDR_24C02,0,(u8 *)Holding.RegI,30);
 		}
 
-		OSTimeDlyHMSM(0, 0, 0, 20);	        // 延时20ms
+		OSTimeDlyHMSM(0, 0, 0, 10);	        // 延时20ms
     }
 }
 
@@ -118,7 +115,7 @@ static  void    uctsk_COLLECT(void *pdata)
 *******************************************************************************/
 static void vHandler_collect(void)
 {
-	uint32_t distemp;
+	uint32_t distemp;           // 显示缓存
 	
 	ADS1115_ReadConversion(adcBuf);            
 	
@@ -142,26 +139,14 @@ static void vHandler_collect(void)
 	// 测试过程中判断
 	if(RecordAction == EXAM_1)     // 正在测试中，如果采集数据从最大值向下跌落，则测试结束，回到测试起点
 	{
+		Input.RegS.BreakTime++;
 		if(Result_adcVal > adcMax)
 		{
 			adcMax = Result_adcVal;           // 记录单次最大值
 			Input.RegS.STR_Max = adcMax;
 		}
 		else
-		{
-			/*
-			if((adcMax - adcVal) >= difMax && adcVal < (difMax >> 1))    // 采集状态下采集值,采集值跌落50%
-			{
-				ExamS_Flag = DOWN;
-			}
-			if(ExamS_Flag == DOWN && adcVal < (difMax >> 2))
-			{
-				// 测试结束
-				Action_Flag = EXAM_2;            // 停止			
-				TexMove = allmove;               // recorde 记录测试伸长量,用于计算
-			}
-			*/
-			
+		{			
 			// 并且最大车辆值与当前采集值之差需要大于最大允许偏差值
 			// 右移两位，测试结果比最大值跌落25%，判断为测试结束
 			if((adcMax - Result_adcVal) >= difMax && (adcMax - Result_adcVal) >= (difMax >> 2))   
@@ -177,7 +162,7 @@ static void vHandler_collect(void)
 					
 					// 拉停长度 (伸长)
 					TexMove = allmove;               // 拉断伸长，recorde 脉冲数，记录测试伸长量,用于计算
-					Input.RegS.Length = LEAD * TexMove * 100 / Holding.RegS.StepLong;      // 伸长
+					Input.RegS.Length = (LEAD * TexMove * 100 / Holding.RegS.StepLong) >> 1;      // 伸长
 				}
 			}
 		}
@@ -188,7 +173,7 @@ static void vHandler_collect(void)
 	{
 		case Newton:
 			distemp = strDisSta * Result_adcVal;
-			Input.RegS.Strong = distemp / Input.RegS.FullScaleAD;
+			Input.RegS.BreakingForce = distemp / Input.RegS.FullScaleAD;          // 断裂强力
 			break;
 		
 		case cNewton:

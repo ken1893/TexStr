@@ -106,7 +106,7 @@ union HOLDREG_U
 	struct HONDREG_S
 	{ 
 		u16 Density;          // 线密度 density                      0		R
-    u16 tSTR_Max;         // 拉伸最大结果    			   		       1		R
+    u16 tSTR_Max;         // 拉伸最大结果    			   		         1		R
 	  //-------------------------------------------------------------------------
     u16 Action;           //  Aciton                             2		R/W
 		
@@ -119,7 +119,7 @@ union HOLDREG_U
 		
 		u16 Distance;       //  长度，夹持距离    Null                8		R/W
 		
-		u16 CycleNum;       //  从零点回止距离/ 1000   0.01-9999.9    9		R/W
+		u16 CycleNum;       //  从零点回止距离/ 1000   0.01-9999.9    9		R/W      长度
 		u16 Lead;           //  导程                                  A		R/W
 		
 		// 测试参数
@@ -129,7 +129,7 @@ union HOLDREG_U
 		u16 Standard;        //  校准值，砝码值           				 D		R/W
 		u16 Unit;            //  单位   N，cN 				             E    R/W   
 		
-		u16 tDisplay;		     //  强力显示				                 F		R
+		u16 tDisplay;		     //  强力显示				                   F		R
 		u16 tFullScaleAD;     //  满度校准值						           10		R
 		u16 tZeroScaleAD;     //  零度校准值                      11   R
 		
@@ -148,18 +148,20 @@ union INPUTREG_U
 	unsigned int RegI[13];  // 
 	struct INPUTREG_S
 	{
-		unsigned int STR_Result;          //  0  拉力计算结果 AD值
-		unsigned int STR_Max;             //  1  拉伸最大结果
-		unsigned int ZeroScaleAD;             //  2
-		unsigned int FullScaleAD;             //  3
+		unsigned int STR_Result;          //  0  拉力计算结果 实时AD值
+		unsigned int STR_Max;             //  1  拉伸最大结果 断裂强力对应的ad值
 		
-		unsigned int Strong;              //  4  强力
-		unsigned int Length;              //  5 伸长
-		unsigned int Strength;            //  6 强度
-		unsigned int Elongation;          //  7 伸长率
+		unsigned int ZeroScaleAD;         //  2
+		unsigned int FullScaleAD;         //  3
 		
-		unsigned int ErrorCode;            //  8  error code
-		unsigned int Steady_TimeCounter; //  9
+		unsigned int BreakingForce;       //  4  断裂强力   breaking force
+		unsigned int Length;              //  5  伸长		                                  //              
+		unsigned int BreakingTenacity;    //  6  断裂强度   breaking tenacity  纱线断裂强力与其线密度比值，通常以厘牛顿每特克表示
+		unsigned int Elongation;          //  7  伸长率
+		unsigned int BreakTime;           //  8  断裂时间   
+		
+		unsigned int ErrorCode;           //  9  error code
+		
 		unsigned int Power;              //  A
 		unsigned int Null3;              //  B
 		unsigned int PF;                 //  C

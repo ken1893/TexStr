@@ -139,7 +139,8 @@ static void uctsk_Blink (void)
 					  allmove = 0;
 					  ExamS_Flag = UP;
 					  Current_Fre = 0;
-					  Input.RegS.STR_Max = 0;
+					  Input.RegS.STR_Max = 0;      
+					  Input.RegS.BreakTime = 0;    // ∂œ¡— ±º‰
 					
 						TIM_SetAutoreload(TIM3, FreTab[0]);
 						GPIO_ResetBits(GPIODIRA , DIRPORT);
@@ -185,7 +186,7 @@ static void uctsk_Blink (void)
 				}
 			}
 		
-		OSTimeDlyHMSM(0, 0, 0, 250);	 /* 250 MS  */
+		OSTimeDlyHMSM(0, 0, 0, 200);	 /* 250 MS  */
    }
 }
 
