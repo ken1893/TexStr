@@ -168,12 +168,16 @@ static void uctsk_Blink (void)
 						break;
 					
 					case ZEROSCALE:
-						Input.RegS.ZeroScaleAD = Input.RegS.STR_Result;
+						Holding.RegS.ZeroScaleAD = Input.RegS.STR_Result;
+					  strDisSta = Holding.RegS.FullScaleAD - Holding.RegS.ZeroScaleAD;    // 计算校准力值对应计算值
+					  Flag_Save = 1;
 					  RecordAction = ZEROSCALE;
 						break;
 					
 					case FULLSCALE:
-						Input.RegS.FullScaleAD = Input.RegS.STR_Result;
+						Holding.RegS.FullScaleAD = Input.RegS.STR_Result;
+					  strDisSta = Holding.RegS.FullScaleAD - Holding.RegS.ZeroScaleAD;    // 计算校准力值对应计算值
+					  Flag_Save = 1;
 					  RecordAction = FULLSCALE;
 						break;
 				

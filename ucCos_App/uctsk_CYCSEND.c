@@ -88,7 +88,7 @@ static void uctsk_CYCSEND(void)
 			ComCounter_Timer = 0;
 			//stuff_TxBuf();				
 		}
-		OSTimeDlyHMSM(0, 0, 0, 500);	        // —” ±250ms
+		OSTimeDlyHMSM(0, 0, 0, 250);	        // —” ±250ms
     }
 }
 

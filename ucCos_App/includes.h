@@ -129,9 +129,9 @@ union HOLDREG_U
 		u16 Standard;        //  校准值，砝码值           				 D		R/W
 		u16 Unit;            //  单位   N，cN 				             E    R/W   
 		
-		u16 tDisplay;		     //  强力显示				                   F		R
-		u16 tFullScaleAD;     //  满度校准值						           10		R
-		u16 tZeroScaleAD;     //  零度校准值                      11   R
+		u16 tDisplay;		      //  强力显示				                   F		R
+		u16 FullScaleAD;     //  满度校准值						           10		R
+		u16 ZeroScaleAD;     //  零度校准值                       11   R
 		
 		u16 End_ID;           //  系统                            12		R/W
 		u16 tErrorCode;       //  错误代码			                   13
@@ -151,13 +151,13 @@ union INPUTREG_U
 		unsigned int STR_Result;          //  0  拉力计算结果 实时AD值
 		unsigned int STR_Max;             //  1  拉伸最大结果 断裂强力对应的ad值
 		
-		unsigned int ZeroScaleAD;         //  2
-		unsigned int FullScaleAD;         //  3
+		unsigned int tZeroScaleAD;         //  2
+		unsigned int tFullScaleAD;         //  3
 		
 		unsigned int BreakingForce;       //  4  断裂强力   breaking force
 		unsigned int Length;              //  5  伸长		                                  //              
 		unsigned int BreakingTenacity;    //  6  断裂强度   breaking tenacity  纱线断裂强力与其线密度比值，通常以厘牛顿每特克表示
-		unsigned int Elongation;          //  7  伸长率
+		unsigned int Elongation;          //  7  断裂伸长率 breaking elongation 
 		unsigned int BreakTime;           //  8  断裂时间   
 		
 		unsigned int ErrorCode;           //  9  error code
@@ -222,6 +222,7 @@ COLLECT_EXT uint16_t adcMax;      //
 COLLECT_EXT uint32_t TexMove;     //  测试伸长
 
 COLLECT_EXT uint8_t Flag_Save;    // 需要存储标志
+COLLECT_EXT uint16_t strDisSta;   // 计量计算值 校准满度值full与zero差值
 
 COLLECT_EXT  uint16_t calcStand(uint16_t selAD);            // 计算标准值
 

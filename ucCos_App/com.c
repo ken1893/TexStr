@@ -168,7 +168,7 @@ void ModbusPro(unsigned char com)
 	switch(com)
 		{
 			case 0x04:
-				Read_InputRegister();    // 读输入寄存器
+				Read_InputRegister();      // 读输入寄存器
 			break;
 			
 			//case 0x02:
@@ -304,7 +304,7 @@ void Write_SingleHolding()
 	
 	add = (RxBuf[2] << 8) + RxBuf[3];    // 寄存器地址	
 
-	if(add >= 2 && add <= 12)
+	if(add <= 18)
 	{
 		Holding.RegI[add] = RxBuf[4];
 		Holding.RegI[add] = (Holding.RegI[add] << 8) + RxBuf[5];
@@ -336,7 +336,7 @@ void Write_SingleHolding()
 				break;
 		}
 	}    // 差错
-	else if(add == 0 || add == 0x01 || add >= 13){	  // 寄存器地址 ！= OK
+	else if(add >= 19){	  // 寄存器地址 ！= OK
 		TxBuf[0] = RxBuf[0];     // ID
 		TxBuf[1] = 0x86;         // 差错码 0x86
 		TxBuf[2] = 0x02;
@@ -348,6 +348,7 @@ void Write_SingleHolding()
 
 		TxLen = 5;    // 发送个数	
 	}
+	/*
 	else if(add >= 0x0a && add <= 0x23){   //  小于0x0a地址未允许写入
 	
 		Holding.RegI[add] = RxBuf[4];
@@ -355,7 +356,7 @@ void Write_SingleHolding()
 
 		cpytex(TxBuf,RxBuf);
 		TxLen = 8;                // 发送个数
-	}
+	}*/
 
 	TxEnable_Flag = 1;    // 允许发送
 }

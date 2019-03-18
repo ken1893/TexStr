@@ -32,7 +32,6 @@ static  void    uctsk_COLLECT  (void *pdata);
 static  void    Zero_GPIO_Configuration(void);         // 检测0位
 static  void    vHandler_collect(void);
 
-uint16_t strDisSta;    // 计量计算值
 uint8_t  sampleCount;   // 采样次数
 uint16_t Result_adcVal; // 平均后的ad结果
 uint32_t Sum_adc;       // 求和结果
@@ -59,7 +58,7 @@ static  void    uctsk_COLLECT(void *pdata)
 		/* Initialize the I2C EEPROM driver ----------------------------------------*/
 	I2C_Configuration();
 	
-	I2C_Read(I2C1,ADDR_24C02,0,(u8 *)Holding.RegI,30);
+	I2C_Read(I2C1,ADDR_24C02,0,(u8 *)Holding.RegI,40);
 	//ADS1115_Init();
 
 	Zero_GPIO_Configuration();       
@@ -77,17 +76,13 @@ static  void    uctsk_COLLECT(void *pdata)
 	
 	Holding.RegS.Unit = Newton;     // 
 	
-	strDisSta = calcStand(Holding.RegS.Standard);    // 计算校准力值对应计算值
+	strDisSta = Holding.RegS.FullScaleAD - Holding.RegS.ZeroScaleAD;    // 计算校准力值对应计算值
 
 	GuanTimes_Cache = Holding.RegS.GuanTimes;
-	
-	Holding.RegS.CycleNum  = 100;     // 距离
 	
 	// 计算夹持长度对应电机运行步数
 	ZeroMove = (Holding.RegS.CycleNum / LEAD) * Holding.RegS.StepLong * 2;
 	
-	//Holding.RegS.FreS      = 20;      // 回零速度
-	//Holding.RegS.FreH9     = 20;      // 测试速度
 	
 	/**----------------------Read ID------------------------*/
 	//p = readID();
@@ -98,7 +93,7 @@ static  void    uctsk_COLLECT(void *pdata)
 		if(Flag_Save == 1)
 		{
 			Flag_Save = 0;
-			I2C_Write(I2C1,ADDR_24C02,0,(u8 *)Holding.RegI,30);
+			I2C_Write(I2C1,ADDR_24C02,0,(u8 *)Holding.RegI,40);
 		}
 
 		OSTimeDlyHMSM(0, 0, 0, 10);	        // 延时20ms
@@ -162,24 +157,35 @@ static void vHandler_collect(void)
 					
 					// 拉停长度 (伸长)
 					TexMove = allmove;               // 拉断伸长，recorde 脉冲数，记录测试伸长量,用于计算
-					Input.RegS.Length = (LEAD * TexMove * 100 / Holding.RegS.StepLong) >> 1;      // 伸长
+					Input.RegS.Length = (LEAD * TexMove * 100 / Holding.RegS.StepLong) >> 1;            // 断裂伸长
+					distemp = Input.RegS.Length * 100;     // 计算中间值
+					Input.RegS.Elongation = distemp / Holding.RegS.CycleNum;                            // 断裂伸长率
 				}
 			}
 		}
 	}
 	
 	// 根据计量单位，采集AD结果，计算出重力表示值
+	distemp = Result_adcVal - Holding.RegS.ZeroScaleAD;  // 计算中间值
+	if(distemp >= 60000)
+	{
+		distemp = 0;
+	}
 	switch(Holding.RegS.Unit)
 	{
 		case Newton:
-			distemp = strDisSta * Result_adcVal;
-			Input.RegS.BreakingForce = distemp / Input.RegS.FullScaleAD;          // 断裂强力
+			distemp = distemp * Holding.RegS.Standard * 980;
+			Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
 			break;
 		
 		case cNewton:
+			distemp = distemp * Holding.RegS.Standard * 98000;
+			Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
 			break;
 		
 		case Kilogram:
+			distemp = distemp * Holding.RegS.Standard * 100;
+			Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
 			break;
 		
 		case Pound:
