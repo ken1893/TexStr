@@ -135,6 +135,11 @@ static void vHandler_collect(void)
 	if(RecordAction == EXAM_1)     // 正在测试中，如果采集数据从最大值向下跌落，则测试结束，回到测试起点
 	{
 		Input.RegS.BreakTime++;
+		
+		Input.RegS.Length = (LEAD * allmove * 100 / Holding.RegS.StepLong) >> 1;            // 断裂伸长
+					//distemp = Input.RegS.Length * 100;     // 计算中间值
+	  Input.RegS.Elongation = (Input.RegS.Length * 100) / Holding.RegS.CycleNum;        // 断裂伸长率
+		
 		if(Result_adcVal > adcMax)
 		{
 			adcMax = Result_adcVal;           // 记录单次最大值
@@ -159,7 +164,7 @@ static void vHandler_collect(void)
 					TexMove = allmove;               // 拉断伸长，recorde 脉冲数，记录测试伸长量,用于计算
 					Input.RegS.Length = (LEAD * TexMove * 100 / Holding.RegS.StepLong) >> 1;            // 断裂伸长
 					//distemp = Input.RegS.Length * 100;     // 计算中间值
-					Input.RegS.Elongation = Input.RegS.Length / Holding.RegS.CycleNum;                  // 断裂伸长率
+					Input.RegS.Elongation = (Input.RegS.Length * 100) / Holding.RegS.CycleNum;        // 断裂伸长率
 					
 					// 根据计量单位，采集AD结果，计算出重力表示值
 	        distemp = adcMax - Holding.RegS.ZeroScaleAD;  // 计算中间值
@@ -172,6 +177,7 @@ static void vHandler_collect(void)
 		        case Newton:
 			        distemp = distemp * Holding.RegS.Standard * 980;
 			        Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
+						  Input.RegS.BreakingTenacity = Input.RegS.BreakingForce / Holding.RegS.TEX;
 			        break;
 		
 		        case cNewton:
@@ -190,7 +196,7 @@ static void vHandler_collect(void)
 				}
 			}
 		}
-	}
+	}	
 	
 	// 根据计量单位，采集AD结果，计算出重力表示值
 	distemp = Result_adcVal - Holding.RegS.ZeroScaleAD;  // 计算中间值

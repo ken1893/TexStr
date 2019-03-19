@@ -77,7 +77,8 @@ enum ActionType {
 	  EXAM_1,         // E1               
 	  EXAM_2,         // E2   
 	  EXAM_3,         // E3  
-	  STOP            // STOP                 9
+	  STOP,           // STOP                 9
+	  MOTORDOWN       // DOWN                 10
 };
 
 // 单位选择
@@ -105,14 +106,14 @@ union HOLDREG_U
 	u16 RegI[20];
 	struct HONDREG_S
 	{ 
-		u16 Density;          // 线密度 density                      0		R
-    u16 tSTR_Max;         // 拉伸最大结果    			   		         1		R
+		u16 TEX;              // 线密度 density                      0		R
+    u16 ConstantElongation; // 定伸长   			   		             1		R
 	  //-------------------------------------------------------------------------
     u16 Action;           //  Aciton                             2		R/W
 		
 		// ------------------------------------------------------------------------
 		u16 FreS;        //  回零点频率			  0-85  default  600      3		R/W     
-		u16 Mode;        //  模式       null                          4		R/W
+		u16 ConstantForce;    //  定强力                              4		R/W
     u16 FreH9;       //  测试频率       0-85                      5		R/W
 		u16 Steps;       //  速度台阶    目前固定 50    Null          6		R/W
 		u16 StepLong;    //  细分			       400 - 50000              7		R/W
@@ -120,7 +121,7 @@ union HOLDREG_U
 		u16 Distance;       //  长度，夹持距离    Null                8		R/W
 		
 		u16 CycleNum;       //  从零点回止距离/ 1000   0.01-9999.9    9		R/W      长度
-		u16 ForceDrop;      //  力降                                 A		R/W
+		u16 ForceDrop;      //  力降                                  A		R/W
 		
 		// 测试参数
 		u16 GuanCount;       //  测试管数				                   B	  R/W
@@ -130,11 +131,11 @@ union HOLDREG_U
 		u16 Unit;            //  单位   N，cN 				             E    R/W   
 		
 		u16 tDisplay;		      //  强力显示				                   F		R
-		u16 FullScaleAD;     //  满度校准值						           10		R
+		u16 FullScaleAD;     //  满度校准值						            10		R
 		u16 ZeroScaleAD;     //  零度校准值                       11   R
 		
 		u16 End_ID;           //  系统                            12		R/W
-		u16 tErrorCode;       //  错误代码			                   13
+		u16 tErrorCode;       //  错误代码			                  13
 		
 		// for motion 
 		// u16 ADres[10];		      //             		       20 - 29   R

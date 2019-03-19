@@ -105,6 +105,15 @@ static void uctsk_Blink (void)
 						ControlMove(ENABLE);
 					  RecordAction = MOVEING_2;
 						break;
+					
+					case MOTORDOWN:
+						allmove = 0;
+					  Current_Fre = 0;
+				    TIM_SetAutoreload(TIM3, FreTab[0]);
+					  GPIO_ResetBits(GPIODIRA , DIRPORT);       
+						ControlMove(ENABLE);
+					  RecordAction = MOTORDOWN;
+						break;
 				
 					case STOP:                // 电机停止
 						ControlMove(DISABLE);
@@ -143,6 +152,8 @@ static void uctsk_Blink (void)
 					  adcMax = 0;
 					  Input.RegS.BreakingForce = 0;      
 					  Input.RegS.BreakTime = 0;    // 断裂时间
+					  Input.RegS.Elongation = 0;
+					  Input.RegS.Length = 0;
 					
 						TIM_SetAutoreload(TIM3, FreTab[0]);
 						GPIO_ResetBits(GPIODIRA , DIRPORT);
