@@ -88,7 +88,7 @@ static void uctsk_CYCSEND(void)
 			ComCounter_Timer = 0;
 			//stuff_TxBuf();				
 		}
-		OSTimeDlyHMSM(0, 0, 0, 250);	        // 延时250ms
+		OSTimeDlyHMSM(0, 0, 0, 30);	        // 延时50ms
     }
 }
 
@@ -98,7 +98,6 @@ void stuff_TxBuf(void)
 	TxBuf[5] = (Input.RegS.STR_Result >> 8) & 0xff;
 	TxBuf[6] = Input.RegS.STR_Result & 0xff;
 	
-
 	// 未发送
 	Send_CommonReg(TxBuf,19);	  // 计算校验
 			

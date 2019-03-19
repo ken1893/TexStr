@@ -138,7 +138,7 @@ static void vHandler_collect(void)
 		if(Result_adcVal > adcMax)
 		{
 			adcMax = Result_adcVal;           // 记录单次最大值
-			Input.RegS.STR_Max = adcMax;
+			//Input.RegS.STR_Max = adcMax;
 		}
 		else
 		{			
@@ -158,8 +158,35 @@ static void vHandler_collect(void)
 					// 拉停长度 (伸长)
 					TexMove = allmove;               // 拉断伸长，recorde 脉冲数，记录测试伸长量,用于计算
 					Input.RegS.Length = (LEAD * TexMove * 100 / Holding.RegS.StepLong) >> 1;            // 断裂伸长
-					distemp = Input.RegS.Length * 100;     // 计算中间值
-					Input.RegS.Elongation = distemp / Holding.RegS.CycleNum;                            // 断裂伸长率
+					//distemp = Input.RegS.Length * 100;     // 计算中间值
+					Input.RegS.Elongation = Input.RegS.Length / Holding.RegS.CycleNum;                  // 断裂伸长率
+					
+					// 根据计量单位，采集AD结果，计算出重力表示值
+	        distemp = adcMax - Holding.RegS.ZeroScaleAD;  // 计算中间值
+	        if(distemp >= 60000)
+	        {
+		        distemp = 0;
+ 	        }
+	        switch(Holding.RegS.Unit)
+	        {
+		        case Newton:
+			        distemp = distemp * Holding.RegS.Standard * 980;
+			        Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
+			        break;
+		
+		        case cNewton:
+			        distemp = distemp * Holding.RegS.Standard * 98000;
+			        Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
+			        break;
+		
+		        case Kilogram:
+			        distemp = distemp * Holding.RegS.Standard * 100;
+			        Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
+			        break;
+		
+		        case Pound:
+			        break;
+	        }
 				}
 			}
 		}
@@ -175,17 +202,17 @@ static void vHandler_collect(void)
 	{
 		case Newton:
 			distemp = distemp * Holding.RegS.Standard * 980;
-			Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
+			Input.RegS.Force = distemp / strDisSta;          // 断裂强力
 			break;
 		
 		case cNewton:
 			distemp = distemp * Holding.RegS.Standard * 98000;
-			Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
+			Input.RegS.Force = distemp / strDisSta;          // 断裂强力
 			break;
 		
 		case Kilogram:
 			distemp = distemp * Holding.RegS.Standard * 100;
-			Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
+			Input.RegS.Force = distemp / strDisSta;          // 断裂强力
 			break;
 		
 		case Pound:

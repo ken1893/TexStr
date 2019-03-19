@@ -135,11 +135,13 @@ static void uctsk_Blink (void)
 					
 					case EXAM_1:                  // down向下拉伸
 						TexMove = 0;
-						adcMax = 0;
+						
 					  allmove = 0;
 					  ExamS_Flag = UP;
 					  Current_Fre = 0;
-					  Input.RegS.STR_Max = 0;      
+					
+					  adcMax = 0;
+					  Input.RegS.BreakingForce = 0;      
 					  Input.RegS.BreakTime = 0;    // 断裂时间
 					
 						TIM_SetAutoreload(TIM3, FreTab[0]);

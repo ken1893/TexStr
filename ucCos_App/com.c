@@ -328,11 +328,11 @@ void Write_SingleHolding()
 				break;
 			
 			case 7:     // œ∏∑÷
-				ZeroMove = (Holding.RegS.CycleNum / Holding.RegS.Lead) * Holding.RegS.StepLong * 2;
+				ZeroMove = (Holding.RegS.CycleNum / LEAD) * Holding.RegS.StepLong * 2;
 				break;
 			
 			case 9:     // º–≥÷æ‡¿Î
-				ZeroMove = (Holding.RegS.CycleNum / Holding.RegS.Lead) * Holding.RegS.StepLong * 2;
+				ZeroMove = (Holding.RegS.CycleNum / LEAD) * Holding.RegS.StepLong * 2;
 				break;
 		}
 	}    // ≤Ó¥Ì

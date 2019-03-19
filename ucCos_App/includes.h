@@ -120,7 +120,7 @@ union HOLDREG_U
 		u16 Distance;       //  长度，夹持距离    Null                8		R/W
 		
 		u16 CycleNum;       //  从零点回止距离/ 1000   0.01-9999.9    9		R/W      长度
-		u16 Lead;           //  导程                                  A		R/W
+		u16 ForceDrop;      //  力降                                 A		R/W
 		
 		// 测试参数
 		u16 GuanCount;       //  测试管数				                   B	  R/W
@@ -149,12 +149,12 @@ union INPUTREG_U
 	struct INPUTREG_S
 	{
 		unsigned int STR_Result;          //  0  拉力计算结果 实时AD值
-		unsigned int STR_Max;             //  1  拉伸最大结果 断裂强力对应的ad值
+		unsigned int Force;                //  1  实时强力   force
 		
 		unsigned int tZeroScaleAD;         //  2
 		unsigned int tFullScaleAD;         //  3
 		
-		unsigned int BreakingForce;       //  4  断裂强力   breaking force
+		unsigned int BreakingForce;       //  4  断裂强力   breaking force 拉伸最大结果 断裂强力对应的ad值
 		unsigned int Length;              //  5  伸长		                                  //              
 		unsigned int BreakingTenacity;    //  6  断裂强度   breaking tenacity  纱线断裂强力与其线密度比值，通常以厘牛顿每特克表示
 		unsigned int Elongation;          //  7  断裂伸长率 breaking elongation 
