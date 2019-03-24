@@ -57,24 +57,18 @@ static  void    uctsk_COLLECT(void *pdata)
 {
 		/* Initialize the I2C EEPROM driver ----------------------------------------*/
 	I2C_Configuration();
+
+	I2C_Read(I2C1,ADDR_24C02,0,(u8 *)Holding.RegI,40);       
+	ADS1115_WriteConfig();            //ADS1115_Init();
 	
-	I2C_Read(I2C1,ADDR_24C02,0,(u8 *)Holding.RegI,40);
-	//ADS1115_Init();
-
-	Zero_GPIO_Configuration();       
-
-	ADS1115_WriteConfig();
-	//ADC_Configuration();
+	Zero_GPIO_Configuration();
 	
 	Flag_Save = 0;
 	
 	sampleCount = 0;       // sample count init
 	Sum_adc = 0;
-	#ifdef TEST
-  countad = 0;   // 
-  #endif 
 	
-	Holding.RegS.Unit = Newton;     // 
+	Holding.RegS.Unit = Mpa;     // 
 	
 	strDisSta = Holding.RegS.FullScaleAD - Holding.RegS.ZeroScaleAD;    // 计算校准力值对应计算值
 
@@ -82,10 +76,6 @@ static  void    uctsk_COLLECT(void *pdata)
 	
 	// 计算夹持长度对应电机运行步数
 	ZeroMove = (Holding.RegS.CycleNum / LEAD) * Holding.RegS.StepLong * 2;
-	
-	
-	/**----------------------Read ID------------------------*/
-	//p = readID();
 
 	for(;;){
 		vHandler_collect();
@@ -96,7 +86,7 @@ static  void    uctsk_COLLECT(void *pdata)
 			I2C_Write(I2C1,ADDR_24C02,0,(u8 *)Holding.RegI,40);
 		}
 
-		OSTimeDlyHMSM(0, 0, 0, 10);	        // 延时20ms
+		OSTimeDlyHMSM(0, 0, 0, 10);	        // 延时10ms
     }
 }
 
@@ -111,6 +101,8 @@ static  void    uctsk_COLLECT(void *pdata)
 static void vHandler_collect(void)
 {
 	uint32_t distemp;           // 显示缓存
+	uint16_t DropTemp;          // 力降缓存
+	uint32_t Mtemp;             // 中间结果
 	
 	ADS1115_ReadConversion(adcBuf);            
 	
@@ -136,7 +128,7 @@ static void vHandler_collect(void)
 	{
 		Input.RegS.BreakTime++;
 		
-		Input.RegS.Length = (LEAD * allmove * 100 / Holding.RegS.StepLong) >> 1;            // 断裂伸长
+		Input.RegS.Length = (LEAD * allmove * 100 / Holding.RegS.StepLong) >> 1;          // 断裂伸长
 					//distemp = Input.RegS.Length * 100;     // 计算中间值
 	  Input.RegS.Elongation = (Input.RegS.Length * 100) / Holding.RegS.CycleNum;        // 断裂伸长率
 		
@@ -149,7 +141,10 @@ static void vHandler_collect(void)
 		{			
 			// 并且最大车辆值与当前采集值之差需要大于最大允许偏差值
 			// 右移两位，测试结果比最大值跌落25%，判断为测试结束
-			if((adcMax - Result_adcVal) >= difMax && (adcMax - Result_adcVal) >= (difMax >> 2))   
+			// 力降
+			
+			 // DropTemp = 
+			if((adcMax - Result_adcVal) >= difMax && (adcMax - Result_adcVal) >= (adcMax >> 2))   
 			{
 				// 测试结束
 				if(ExamS_Flag == UP)
@@ -177,7 +172,7 @@ static void vHandler_collect(void)
 		        case Newton:
 			        distemp = distemp * Holding.RegS.Standard * 980;
 			        Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
-						  Input.RegS.BreakingTenacity = Input.RegS.BreakingForce / Holding.RegS.TEX;
+						  Input.RegS.BreakingTenacity = Input.RegS.BreakingForce / Holding.RegS.TEX;   // 断裂强度
 			        break;
 		
 		        case cNewton:
@@ -192,6 +187,19 @@ static void vHandler_collect(void)
 		
 		        case Pound:
 			        break;
+						
+						case Mpa:
+							distemp = distemp * Holding.RegS.Standard * 98000;
+			        Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
+						  
+              Mtemp = Input.RegS.BreakingForce;
+						  Mtemp = Mtemp * 100;
+							Mtemp = Mtemp / (Holding.RegS.TEX >> 1);
+						  Mtemp = Mtemp / (Holding.RegS.TEX >> 1);
+						  Mtemp = Mtemp / 314;
+						
+						  Input.RegS.BreakingTenacity = Mtemp;   // 断裂强度
+			      break;
 	        }
 				}
 			}
@@ -223,24 +231,13 @@ static void vHandler_collect(void)
 		
 		case Pound:
 			break;
+		
+		case Mpa:
+			distemp = distemp * Holding.RegS.Standard * 98000;
+			Input.RegS.Force = distemp / strDisSta;          // 断裂强力
+		  
+			break;
 	}
-	
-	#ifdef TEST
-	if(RecordAction == EXAM_1)
-	{
-		if(countad < 10)
-		{
-			//Holding.RegS.ADres[countad] = adcVal; //
-			countad++;   // 
-		}
-		else 
-		{
-			//printf("D0:%d,D1:%d,D2:%d,D2:%d,D4:%d,D5:%d,D6:%d,D7:%d,D8:%d,D9:%d\r\n", CoAD[0],CoAD[1],CoAD[2],CoAD[3],CoAD[4],CoAD[5],CoAD[6],CoAD[7],CoAD[8],CoAD[9]);
-			countad = 0;
-			//Holding.RegS.ADres[countad] = adcVal; //
-		}
-	}
-  #endif 
 }
 
 

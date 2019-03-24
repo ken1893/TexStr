@@ -200,10 +200,26 @@ static void uctsk_Blink (void)
 				if(RecordAction != EXAM_2 && RecordAction != EXAM_START)
 				{
 					Action_Flag = WAITING;
+					
+					if(RecordAction == MOVEING_1)     // 判断零点
+					{
+						if(GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_4) == 0)
+	          {
+							if(RecordAction != MOVEING_2)
+		          {
+								ControlMove(DISABLE);
+		          }
+		          if(RecordAction == MOVEING_1) // 回零动作
+		          {
+								Action_Flag = MOVEING_2;
+								allmove = 0;
+		          }
+	          }
+					}
 				}
 			}
 		
-		OSTimeDlyHMSM(0, 0, 0, 200);	 /* 250 MS  */
+		OSTimeDlyHMSM(0, 0, 0, 50);	 /* 50 MS  */
    }
 }
 

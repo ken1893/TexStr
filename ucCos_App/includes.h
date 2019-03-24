@@ -20,7 +20,6 @@
 **
 *********************************************************************************************************/
 
-
 #ifndef  __INCLUDES_H__
 #define  __INCLUDES_H__
 
@@ -53,11 +52,6 @@
 
 #include "ads1115.h"
 
-#define TEST
-
-#define ZEROFRE			  0x0003
-#define ACTFRE	      0x0000 
-#define ADD_TARGET		0x0026       // 目标调光深度
 
 #define LEAD        5 
 #define difMax      100       // 容差
@@ -86,7 +80,8 @@ enum UnitType {
 	Newton = 1,          // N  1
 	cNewton,             // cN
 	Kilogram,            // kg
-	Pound                // lb
+	Pound,               // lb
+	Mpa                  // 
 };
 
 
@@ -106,39 +101,36 @@ union HOLDREG_U
 	u16 RegI[20];
 	struct HONDREG_S
 	{ 
-		u16 TEX;              // 线密度 density                      0		R
+		u16 TEX;                // 线密度 density                    0		R
     u16 ConstantElongation; // 定伸长   			   		             1		R
 	  //-------------------------------------------------------------------------
-    u16 Action;           //  Aciton                             2		R/W
+    u16 Action;             //  Aciton                           2		R/W
 		
 		// ------------------------------------------------------------------------
-		u16 FreS;        //  回零点频率			  0-85  default  600      3		R/W     
+		u16 FreS;             //  回零点频率			                    3		R/W     
 		u16 ConstantForce;    //  定强力                              4		R/W
     u16 FreH9;       //  测试频率       0-85                      5		R/W
 		u16 Steps;       //  速度台阶    目前固定 50    Null          6		R/W
 		u16 StepLong;    //  细分			       400 - 50000              7		R/W
 		
 		u16 Distance;       //  长度，夹持距离    Null                8		R/W
-		
 		u16 CycleNum;       //  从零点回止距离/ 1000   0.01-9999.9    9		R/W      长度
-		u16 ForceDrop;      //  力降                                  A		R/W
+		
+		u16 ForceDrop;      //  力降                                  A(10)		R/W
 		
 		// 测试参数
-		u16 GuanCount;       //  测试管数				                   B	  R/W
-		u16 GuanTimes;       //  测试次数					                 C		R/W
+		u16 GuanCount;       //  测试管数				                   B(11)	  R/W
+		u16 GuanTimes;       //  测试次数					                 C(12)		R/W
 	  //-------------------------------------------------------------------------	
 		u16 Standard;        //  校准值，砝码值           				 D		R/W
 		u16 Unit;            //  单位   N，cN 				             E    R/W   
 		
-		u16 tDisplay;		      //  强力显示				                   F		R
+		u16 tDisplay;		     //  强力显示				                   F		R
 		u16 FullScaleAD;     //  满度校准值						            10		R
 		u16 ZeroScaleAD;     //  零度校准值                       11   R
 		
-		u16 End_ID;           //  系统                            12		R/W
-		u16 tErrorCode;       //  错误代码			                  13
-		
-		// for motion 
-		// u16 ADres[10];		      //             		       20 - 29   R
+		u16 End_ID;          //  系统                            12		R/W
+		u16 tErrorCode;      //  错误代码			                  13
 		
 	}RegS;
 };
@@ -163,9 +155,9 @@ union INPUTREG_U
 		
 		unsigned int ErrorCode;           //  9  error code
 		
-		unsigned int Power;              //  A
-		unsigned int Null3;              //  B
-		unsigned int PF;                 //  C
+		unsigned int Power;               //  A
+		unsigned int Null3;               //  B
+		unsigned int PF;                  //  C
 
 	}RegS;
 };
@@ -189,10 +181,9 @@ BLINK_EXT u16 RecordAction;          // 记录上一个动作
 
 BLINK_EXT __IO uint32_t allmove;     // 电机运行总pulse
 BLINK_EXT __IO uint32_t backmove;    // 测试时回的pulse
-BLINK_EXT __IO uint8_t stepmove;     // 当前频率pulse,台阶W
+BLINK_EXT __IO uint8_t  stepmove;     // 当前频率pulse,台阶W
 
-BLINK_EXT uint32_t ZeroMove;         // 夹持长度换算为电机运行步数
-BLINK_EXT uint8_t GuanTimes_Cache;   
+BLINK_EXT uint8_t  GuanTimes_Cache;   
 
 enum SpeedType {
     UP,        // 
@@ -217,20 +208,18 @@ BLINK_EXT void ControlMove(FunctionalState C);      //
 // for moter move    
 
 // for AD
-COLLECT_EXT uint8_t adcBuf[2];    //  
+COLLECT_EXT uint8_t  adcBuf[2];   //  
 COLLECT_EXT uint16_t adcVal;      //  
 COLLECT_EXT uint16_t adcMax;      //  
-COLLECT_EXT uint32_t TexMove;     //  测试伸长
 
-COLLECT_EXT uint8_t Flag_Save;    // 需要存储标志
+COLLECT_EXT uint32_t TexMove;     //  测试伸长
+COLLECT_EXT uint32_t ZeroMove;    // 夹持长度换算为电机运行步数
+
+COLLECT_EXT uint8_t  Flag_Save;   // 需要存储标志
 COLLECT_EXT uint16_t strDisSta;   // 计量计算值 校准满度值full与zero差值
 
 COLLECT_EXT  uint16_t calcStand(uint16_t selAD);            // 计算标准值
 
-#ifdef TEST
-
-COLLECT_EXT uint8_t countad;      // 
-#endif 
 
 #ifdef CYCSEND_GLOBALS
 #define CYCSEND_EXT

@@ -40,7 +40,6 @@ static  OS_STK  AppCYCSENDTaskStk[APP_TASK_CYCSEND_STK_SIZE];
 static  void    uctsk_CYCSEND  (void);
 
 void usartsend_pros(void);    // send common 串口发送
-void stuff_TxBuf(void);       // 装载窗口发送数据，主动发送状态装包
 extern void UartDeal(void);   // 接收完成，处理数据包
 extern void Send_CommonReg(u8* pBuffer, u8 Num);     // 发送寄存器
 
@@ -82,27 +81,10 @@ static void uctsk_CYCSEND(void)
 			pkt_Flag = 0;       // 处理结束
 		}
 		
-		// 定时主动发送 控制软件端发送启动命令
-		ComCounter_Timer++;
-		if(ComCounter_Timer >= 10){     // 定时发送,正在接收状态则等待处理接收完毕   && RxState == RX_STATE_ID
-			ComCounter_Timer = 0;
-			//stuff_TxBuf();				
-		}
 		OSTimeDlyHMSM(0, 0, 0, 30);	        // 延时50ms
     }
 }
 
-// 装载窗口发送数据，主动发送状态
-void stuff_TxBuf(void)
-{
-	TxBuf[5] = (Input.RegS.STR_Result >> 8) & 0xff;
-	TxBuf[6] = Input.RegS.STR_Result & 0xff;
-	
-	// 未发送
-	Send_CommonReg(TxBuf,19);	  // 计算校验
-			
-	usartsend_pros();           // send common 串口发送
-}
 
 //------------------------------------串口发送---------------------------------------
 //   调用主动发送
