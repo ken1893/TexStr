@@ -125,14 +125,13 @@ static void vHandler_collect(void)
 		Input.RegS.BreakTime++;
 		
 		Input.RegS.Length = (LEAD * allmove * 100 / Holding.RegS.StepLong) >> 1;          // 断裂伸长
-					//distemp = Input.RegS.Length * 100;     // 计算中间值
+					
 	  Input.RegS.Elongation = (Input.RegS.Length * 100) / Holding.RegS.CycleNum;        // 断裂伸长率
 		
 		if(Result_adcVal > adcMax)
 		{
 			adcMax = Result_adcVal;           // 记录单次最大值
 			DropTemp = (adcMax / 10) * (Holding.RegS.ForceDrop / 10);    // 计算力降
-			//Input.RegS.STR_Max = adcMax;
 		}
 		else
 		{			
@@ -140,7 +139,6 @@ static void vHandler_collect(void)
 			// 右移两位，测试结果比最大值跌落25%，判断为测试结束
 			// 力降
 			
-			 // DropTemp = 
 			if((adcMax - Result_adcVal) >= difMax && (adcMax - Result_adcVal) >= DropTemp)  // 大于最小容差并且，力值减小大于力降 
 			{
 				// 测试结束
@@ -154,9 +152,9 @@ static void vHandler_collect(void)
 					
 					// 拉停长度 (伸长)
 					TexMove = allmove;               // 拉断伸长，recorde 脉冲数，记录测试伸长量,用于计算
-					Input.RegS.Length = (LEAD * TexMove * 100 / Holding.RegS.StepLong) >> 1;          // 断裂伸长
+					Input.RegS.Length = (LEAD * TexMove * 10 / Holding.RegS.StepLong) >> 1;          // 断裂伸长
 					//distemp = Input.RegS.Length * 100;     // 计算中间值
-					Input.RegS.Elongation = (Input.RegS.Length * 100) / Holding.RegS.CycleNum;        // 断裂伸长率
+					Input.RegS.Elongation = (Input.RegS.Length * 10) / Holding.RegS.CycleNum;        // 断裂伸长率
 					
 					// 根据计量单位，采集AD结果，计算出重力表示值
 	        distemp = adcMax - Holding.RegS.ZeroScaleAD;  // 计算中间值
@@ -167,19 +165,19 @@ static void vHandler_collect(void)
 	        switch(Holding.RegS.Unit)      // 断裂，显示断裂强力，断裂强度，统计信息
 	        {
 		        case Newton:
-			        distemp = distemp * Holding.RegS.Standard * 980;
+			        distemp = distemp * Holding.RegS.Standard * 98;
 			        Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
 						  Input.RegS.BreakingTenacity = Input.RegS.BreakingForce / Holding.RegS.TEX;   // 断裂强度
 			        break;
 		
 		        case cNewton:
-			        distemp = distemp * Holding.RegS.Standard * 98000;
+			        distemp = distemp * Holding.RegS.Standard * 9800;
 			        Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
 						  Input.RegS.BreakingTenacity = Input.RegS.BreakingForce / Holding.RegS.TEX;   // 断裂强度
 			        break;
 		
 		        case Kilogram:
-			        distemp = distemp * Holding.RegS.Standard * 100;
+			        distemp = distemp * Holding.RegS.Standard * 10;
 			        Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
 			        break;
 		
@@ -187,12 +185,12 @@ static void vHandler_collect(void)
 			        break;
 						
 						case Mpa:                            // 1N = 100cN   N/mm2 = Mpa
-							distemp = distemp * Holding.RegS.Standard * 98000;
+							distemp = distemp * Holding.RegS.Standard * 9800;
 			        Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
 						  
               Mtemp = ((uint32_t)Input.RegS.BreakingForce & 0xffff);
 							Mtemp = Mtemp * 100 / (Holding.RegS.TEX >> 1);
-						  Mtemp = Mtemp * 100 / (Holding.RegS.TEX >> 1);
+						  Mtemp = Mtemp * 10 / (Holding.RegS.TEX >> 1);
 						  Mtemp = Mtemp / 314;
 						
 						  Input.RegS.BreakingTenacity = Mtemp;   // 断裂强度
@@ -212,17 +210,17 @@ static void vHandler_collect(void)
 	switch(Holding.RegS.Unit)   // 显示实时值，强力值，拉伸值
 	{
 		case Newton:
-			distemp = distemp * Holding.RegS.Standard * 980;
+			distemp = distemp * Holding.RegS.Standard * 98;
 			Input.RegS.Force = distemp / strDisSta;          // 实时强力值
 			break;
 		
 		case cNewton:
-			distemp = distemp * Holding.RegS.Standard * 98000;
+			distemp = distemp * Holding.RegS.Standard * 9800;
 			Input.RegS.Force = distemp / strDisSta;          // 实时强力值
 			break;
 		
 		case Kilogram:
-			distemp = distemp * Holding.RegS.Standard * 100;
+			distemp = distemp * Holding.RegS.Standard * 10;
 			Input.RegS.Force = distemp / strDisSta;          // 实时强力值
 			break;
 		
@@ -230,7 +228,7 @@ static void vHandler_collect(void)
 			break;
 		
 		case Mpa:
-			distemp = distemp * Holding.RegS.Standard * 98000;
+			distemp = distemp * Holding.RegS.Standard * 9800;
 			Input.RegS.Force = distemp / strDisSta;          // 实时强力值
 			break;
 	}
