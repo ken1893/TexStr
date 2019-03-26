@@ -99,11 +99,7 @@ static  void    uctsk_COLLECT(void *pdata)
 * Attention		   : None
 *******************************************************************************/
 static void vHandler_collect(void)
-{
-	uint32_t distemp;           // 显示缓存
-	uint16_t DropTemp;          // 力降缓存
-	uint32_t Mtemp;             // 中间结果
-	
+{	
 	ADS1115_ReadConversion(adcBuf);            
 	
 	// 采用ADS1115 实际采集强力传感器没有负压信号，
@@ -135,6 +131,7 @@ static void vHandler_collect(void)
 		if(Result_adcVal > adcMax)
 		{
 			adcMax = Result_adcVal;           // 记录单次最大值
+			DropTemp = (adcMax / 10) * (Holding.RegS.ForceDrop / 10);    // 计算力降
 			//Input.RegS.STR_Max = adcMax;
 		}
 		else
@@ -144,7 +141,7 @@ static void vHandler_collect(void)
 			// 力降
 			
 			 // DropTemp = 
-			if((adcMax - Result_adcVal) >= difMax && (adcMax - Result_adcVal) >= (adcMax >> 2))   
+			if((adcMax - Result_adcVal) >= difMax && (adcMax - Result_adcVal) >= DropTemp)  // 大于最小容差并且，力值减小大于力降 
 			{
 				// 测试结束
 				if(ExamS_Flag == UP)
@@ -157,7 +154,7 @@ static void vHandler_collect(void)
 					
 					// 拉停长度 (伸长)
 					TexMove = allmove;               // 拉断伸长，recorde 脉冲数，记录测试伸长量,用于计算
-					Input.RegS.Length = (LEAD * TexMove * 100 / Holding.RegS.StepLong) >> 1;            // 断裂伸长
+					Input.RegS.Length = (LEAD * TexMove * 100 / Holding.RegS.StepLong) >> 1;          // 断裂伸长
 					//distemp = Input.RegS.Length * 100;     // 计算中间值
 					Input.RegS.Elongation = (Input.RegS.Length * 100) / Holding.RegS.CycleNum;        // 断裂伸长率
 					
@@ -167,7 +164,7 @@ static void vHandler_collect(void)
 	        {
 		        distemp = 0;
  	        }
-	        switch(Holding.RegS.Unit)
+	        switch(Holding.RegS.Unit)      // 断裂，显示断裂强力，断裂强度，统计信息
 	        {
 		        case Newton:
 			        distemp = distemp * Holding.RegS.Standard * 980;
@@ -178,6 +175,7 @@ static void vHandler_collect(void)
 		        case cNewton:
 			        distemp = distemp * Holding.RegS.Standard * 98000;
 			        Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
+						  Input.RegS.BreakingTenacity = Input.RegS.BreakingForce / Holding.RegS.TEX;   // 断裂强度
 			        break;
 		
 		        case Kilogram:
@@ -188,14 +186,13 @@ static void vHandler_collect(void)
 		        case Pound:
 			        break;
 						
-						case Mpa:
+						case Mpa:                            // 1N = 100cN   N/mm2 = Mpa
 							distemp = distemp * Holding.RegS.Standard * 98000;
 			        Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
 						  
-              Mtemp = Input.RegS.BreakingForce;
-						  Mtemp = Mtemp * 100;
-							Mtemp = Mtemp / (Holding.RegS.TEX >> 1);
-						  Mtemp = Mtemp / (Holding.RegS.TEX >> 1);
+              Mtemp = ((uint32_t)Input.RegS.BreakingForce & 0xffff);
+							Mtemp = Mtemp * 100 / (Holding.RegS.TEX >> 1);
+						  Mtemp = Mtemp * 100 / (Holding.RegS.TEX >> 1);
 						  Mtemp = Mtemp / 314;
 						
 						  Input.RegS.BreakingTenacity = Mtemp;   // 断裂强度
@@ -212,21 +209,21 @@ static void vHandler_collect(void)
 	{
 		distemp = 0;
 	}
-	switch(Holding.RegS.Unit)
+	switch(Holding.RegS.Unit)   // 显示实时值，强力值，拉伸值
 	{
 		case Newton:
 			distemp = distemp * Holding.RegS.Standard * 980;
-			Input.RegS.Force = distemp / strDisSta;          // 断裂强力
+			Input.RegS.Force = distemp / strDisSta;          // 实时强力值
 			break;
 		
 		case cNewton:
 			distemp = distemp * Holding.RegS.Standard * 98000;
-			Input.RegS.Force = distemp / strDisSta;          // 断裂强力
+			Input.RegS.Force = distemp / strDisSta;          // 实时强力值
 			break;
 		
 		case Kilogram:
 			distemp = distemp * Holding.RegS.Standard * 100;
-			Input.RegS.Force = distemp / strDisSta;          // 断裂强力
+			Input.RegS.Force = distemp / strDisSta;          // 实时强力值
 			break;
 		
 		case Pound:
@@ -234,8 +231,7 @@ static void vHandler_collect(void)
 		
 		case Mpa:
 			distemp = distemp * Holding.RegS.Standard * 98000;
-			Input.RegS.Force = distemp / strDisSta;          // 断裂强力
-		  
+			Input.RegS.Force = distemp / strDisSta;          // 实时强力值
 			break;
 	}
 }
@@ -294,30 +290,6 @@ static void Zero_GPIO_Configuration(void)
 	EXTI_InitStructure.EXTI_Trigger=EXTI_Trigger_Falling;
 	EXTI_InitStructure.EXTI_LineCmd=ENABLE;
 	EXTI_Init(&EXTI_InitStructure);	
-}
-
-//--------------------------------------------------------------------
-uint16_t calcStand(uint16_t selAD)
-{	
-	uint16_t stdtemp;
-	
-	switch(Holding.RegS.Unit)
-	{
-		case Newton:
-			stdtemp = (selAD * 980);    // 小数点后2位
-		  break;
-		
-		case cNewton:
-			break;
-		
-		case Kilogram:
-			break;
-		
-		case Pound:
-			break;
-	}
-	
-	return stdtemp;
 }
 
 

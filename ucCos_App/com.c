@@ -334,6 +334,11 @@ void Write_SingleHolding()
 			case 9:     // ¼Ð³Ö¾àÀë
 				ZeroMove = (Holding.RegS.CycleNum / LEAD) * Holding.RegS.StepLong * 2;
 				break;
+			
+			case 10:    // force drop 
+				if(Holding.RegS.ForceDrop < 10)Holding.RegS.ForceDrop = 10;    // the min forcedrop is 10%
+				break;
+			
 		}
 	}    // ²î´í
 	else if(add >= 19){	  // ¼Ä´æÆ÷µØÖ· £¡= OK

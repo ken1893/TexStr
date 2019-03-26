@@ -212,13 +212,16 @@ COLLECT_EXT uint8_t  adcBuf[2];   //
 COLLECT_EXT uint16_t adcVal;      //  
 COLLECT_EXT uint16_t adcMax;      //  
 
-COLLECT_EXT uint32_t TexMove;     //  测试伸长
+COLLECT_EXT uint32_t TexMove;     // 测试伸长
 COLLECT_EXT uint32_t ZeroMove;    // 夹持长度换算为电机运行步数
 
 COLLECT_EXT uint8_t  Flag_Save;   // 需要存储标志
 COLLECT_EXT uint16_t strDisSta;   // 计量计算值 校准满度值full与zero差值
 
-COLLECT_EXT  uint16_t calcStand(uint16_t selAD);            // 计算标准值
+COLLECT_EXT uint32_t Mtemp;             // 中间结果
+COLLECT_EXT	uint16_t DropTemp;          // 力降缓存
+
+COLLECT_EXT uint32_t distemp;           // 显示缓存
 
 
 #ifdef CYCSEND_GLOBALS
