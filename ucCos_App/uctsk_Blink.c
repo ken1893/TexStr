@@ -152,6 +152,9 @@ static void uctsk_Blink (void)
 					  adcMax = 0;
 					  Input.RegS.BreakingForce = 0;      
 					  Input.RegS.BreakTime = 0;    // 断裂时间
+					  timetemp = 0;                // 断裂时间计数
+					  Input.RegS.StartForce = 0;   // 初始模量清零
+					  startforceADtemp = 0;
 					  Input.RegS.Elongation = 0;
 					  Input.RegS.Length = 0;
 					

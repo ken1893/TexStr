@@ -329,10 +329,12 @@ void Write_SingleHolding()
 			
 			case 7:     // œ∏∑÷
 				ZeroMove = (Holding.RegS.CycleNum / LEAD) * Holding.RegS.StepLong * 2;
+			  startforcetemp = ZeroMove / 100;
 				break;
 			
 			case 9:     // º–≥÷æ‡¿Î
 				ZeroMove = (Holding.RegS.CycleNum / LEAD) * Holding.RegS.StepLong * 2;
+			  startforcetemp = ZeroMove / 100;
 				break;
 			
 			case 10:    // force drop 

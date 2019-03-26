@@ -64,6 +64,7 @@ static  void    uctsk_COLLECT(void *pdata)
 	Zero_GPIO_Configuration();
 	
 	Flag_Save = 0;
+	timetemp = 0;
 	
 	sampleCount = 0;       // sample count init
 	Sum_adc = 0;
@@ -76,6 +77,7 @@ static  void    uctsk_COLLECT(void *pdata)
 	
 	// 计算夹持长度对应电机运行步数
 	ZeroMove = (Holding.RegS.CycleNum / LEAD) * Holding.RegS.StepLong * 2;
+	startforcetemp = ZeroMove / 100;
 
 	for(;;){
 		vHandler_collect();
@@ -122,11 +124,20 @@ static void vHandler_collect(void)
 	// 测试过程中判断
 	if(RecordAction == EXAM_1)     // 正在测试中，如果采集数据从最大值向下跌落，则测试结束，回到测试起点
 	{
-		Input.RegS.BreakTime++;
+		timetemp++;
+		if(timetemp >= 10)
+		{
+			timetemp = 0;
+			Input.RegS.BreakTime++;
+		}
 		
-		Input.RegS.Length = (LEAD * allmove * 100 / Holding.RegS.StepLong) >> 1;          // 断裂伸长
-					
+		Input.RegS.Length = (LEAD * allmove * 10 / Holding.RegS.StepLong) >> 1;          // 断裂伸长
 	  Input.RegS.Elongation = (Input.RegS.Length * 100) / Holding.RegS.CycleNum;        // 断裂伸长率
+		
+		if(allmove >= startforcetemp && startforceADtemp == 0)   // and only can calc one times    1%
+		{
+			startforceADtemp = Result_adcVal;   // record 1% AD
+		}
 		
 		if(Result_adcVal > adcMax)
 		{
@@ -154,7 +165,7 @@ static void vHandler_collect(void)
 					TexMove = allmove;               // 拉断伸长，recorde 脉冲数，记录测试伸长量,用于计算
 					Input.RegS.Length = (LEAD * TexMove * 10 / Holding.RegS.StepLong) >> 1;          // 断裂伸长
 					//distemp = Input.RegS.Length * 100;     // 计算中间值
-					Input.RegS.Elongation = (Input.RegS.Length * 10) / Holding.RegS.CycleNum;        // 断裂伸长率
+					Input.RegS.Elongation = (Input.RegS.Length * 100) / Holding.RegS.CycleNum;        // 断裂伸长率
 					
 					// 根据计量单位，采集AD结果，计算出重力表示值
 	        distemp = adcMax - Holding.RegS.ZeroScaleAD;  // 计算中间值
@@ -187,9 +198,10 @@ static void vHandler_collect(void)
 						case Mpa:                            // 1N = 100cN   N/mm2 = Mpa
 							distemp = distemp * Holding.RegS.Standard * 9800;
 			        Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
+						  Input.RegS.StartForce = (startforceADtemp - Holding.RegS.ZeroScaleAD) * Holding.RegS.Standard * 9800;   // 初始模量
 						  
               Mtemp = ((uint32_t)Input.RegS.BreakingForce & 0xffff);
-							Mtemp = Mtemp * 100 / (Holding.RegS.TEX >> 1);
+							Mtemp = Mtemp * 10 / (Holding.RegS.TEX >> 1);
 						  Mtemp = Mtemp * 10 / (Holding.RegS.TEX >> 1);
 						  Mtemp = Mtemp / 314;
 						

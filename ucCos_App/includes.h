@@ -153,9 +153,9 @@ union INPUTREG_U
 		unsigned int Elongation;          //  7  断裂伸长率 breaking elongation 
 		unsigned int BreakTime;           //  8  断裂时间   
 		
-		unsigned int ErrorCode;           //  9  error code
+		unsigned int StartForce;           // 9  初始模量
 		
-		unsigned int Power;               //  A
+		unsigned int ErrorCode;               //  A  error code
 		unsigned int Null3;               //  B
 		unsigned int PF;                  //  C
 
@@ -181,7 +181,7 @@ BLINK_EXT u16 RecordAction;          // 记录上一个动作
 
 BLINK_EXT __IO uint32_t allmove;     // 电机运行总pulse
 BLINK_EXT __IO uint32_t backmove;    // 测试时回的pulse
-BLINK_EXT __IO uint8_t  stepmove;     // 当前频率pulse,台阶W
+BLINK_EXT __IO uint8_t  stepmove;    // 当前频率pulse,台阶W
 
 BLINK_EXT uint8_t  GuanTimes_Cache;   
 
@@ -222,6 +222,9 @@ COLLECT_EXT uint32_t Mtemp;             // 中间结果
 COLLECT_EXT	uint16_t DropTemp;          // 力降缓存
 
 COLLECT_EXT uint32_t distemp;           // 显示缓存
+COLLECT_EXT uint8_t timetemp;           // 试验时间计数
+COLLECT_EXT uint16_t startforcetemp;    // 初始模量长度缓存
+COLLECT_EXT uint16_t startforceADtemp;    // 初始模量AD缓存
 
 
 #ifdef CYCSEND_GLOBALS
