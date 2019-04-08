@@ -31,9 +31,12 @@ static void PWM_GPIO_Configuration(void);     // 脉冲输出IO初始化
 static void Tim3_Configuration(void);         // 时钟3初始化 PA6  TIM3_CH1
 //static void Tim5_Configuration(void);       // TIM5_CH2
 static void UART1_Configuration(INT32U baud_rate);		  //  
+static void Usart2_Init(INT32U baud);
 
 extern void RxIntEn (void);
 void RunProcess(unsigned long AllRunStep,unsigned char StepW);
+
+//uint8_t U2test;
 
 void  App_BlinkTaskCreate (void)
 {
@@ -68,9 +71,10 @@ static void uctsk_Blink (void)
 	
 	Tim3_Configuration();
 	UART1_Configuration(57600);
+	Usart2_Init(9600);                // for print
 	
    	for(;;)
-   	{
+   	{			
 			if(led_state)
 			{
 				led_state = 0;
@@ -130,8 +134,10 @@ static void uctsk_Blink (void)
 							if(Holding.RegS.GuanTimes != 0)
 							{
 								Holding.RegS.GuanTimes--;
+								TexTestTimes = Once;
 								if(Holding.RegS.GuanTimes == 0)
 								{
+									TexTestTimes = Last;
 									Holding.RegS.GuanCount--;
 									if(Holding.RegS.GuanCount != 0)Holding.RegS.GuanTimes = GuanTimes_Cache;
 								}
@@ -157,6 +163,7 @@ static void uctsk_Blink (void)
 					  startforceADtemp = 0;
 					  Input.RegS.Elongation = 0;
 					  Input.RegS.Length = 0;
+					  Holding.RegS.SysCode = NoTest;
 					
 						TIM_SetAutoreload(TIM3, FreTab[0]);
 						GPIO_ResetBits(GPIODIRA , DIRPORT);
@@ -188,6 +195,7 @@ static void uctsk_Blink (void)
 					  strDisSta = Holding.RegS.FullScaleAD - Holding.RegS.ZeroScaleAD;    // 计算校准力值对应计算值
 					  Flag_Save = 1;
 					  RecordAction = ZEROSCALE;
+					  hangjianju();
 						break;
 					
 					case FULLSCALE:
@@ -195,6 +203,7 @@ static void uctsk_Blink (void)
 					  strDisSta = Holding.RegS.FullScaleAD - Holding.RegS.ZeroScaleAD;    // 计算校准力值对应计算值
 					  Flag_Save = 1;
 					  RecordAction = FULLSCALE;
+					  shuipingzhaobiao();
 						break;
 				
 					default:break;
@@ -462,6 +471,55 @@ void UART1_Configuration(INT32U baud_rate)
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;	           //使能中断
 	            
     NVIC_Init(&NVIC_InitStructure);	
+}
+
+
+//-------------------------------------------------------------------------
+//	函数名称：	Usart2_Init
+//	函数功能：	串口2初始化
+//	入口参数：	baud：设定的波特率
+//	返回参数：	无
+//	说明：		TX-PA2		RX-PA3
+//-------------------------------------------------------------------------
+void Usart2_Init(INT32U baud)
+{
+    GPIO_InitTypeDef gpio_initstruct;
+    USART_InitTypeDef usart_initstruct;
+    //NVIC_InitTypeDef nvic_initstruct;
+
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
+
+    //PA2	TXD
+    gpio_initstruct.GPIO_Mode = GPIO_Mode_AF_PP;
+    gpio_initstruct.GPIO_Pin = GPIO_Pin_2;
+    gpio_initstruct.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOA, &gpio_initstruct);
+
+    //PA3	RXD
+    gpio_initstruct.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+    gpio_initstruct.GPIO_Pin = GPIO_Pin_3;
+    gpio_initstruct.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOA, &gpio_initstruct);
+
+    usart_initstruct.USART_BaudRate = baud;
+    usart_initstruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;		//无硬件流控
+    usart_initstruct.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;			// 接收和发送
+    usart_initstruct.USART_Parity = USART_Parity_No;									// 无校验
+    usart_initstruct.USART_StopBits = USART_StopBits_1;								// 1位停止位
+    usart_initstruct.USART_WordLength = USART_WordLength_8b;					// 8位数据位
+    USART_Init(USART2, &usart_initstruct);
+
+    USART_Cmd(USART2, ENABLE);														// 使能串口
+
+    //USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);				// 使能接收中断
+
+    //nvic_initstruct.NVIC_IRQChannel = USART2_IRQn;
+    //nvic_initstruct.NVIC_IRQChannelCmd = ENABLE;
+    //nvic_initstruct.NVIC_IRQChannelPreemptionPriority = 0;
+    //nvic_initstruct.NVIC_IRQChannelSubPriority = 0;
+    //NVIC_Init(&nvic_initstruct);
+
 }
 
 /**

@@ -160,6 +160,7 @@ static void vHandler_collect(void)
 				else 
 				{
 					Action_Flag = EXAM_2;            // 停止		
+					Holding.RegS.SysCode = TexTestTimes;    // 一次测试结束或一管测试结束标志
 					
 					// 拉停长度 (伸长)
 					TexMove = allmove;               // 拉断伸长，recorde 脉冲数，记录测试伸长量,用于计算
@@ -195,17 +196,22 @@ static void vHandler_collect(void)
 		        case Pound:
 			        break;
 						
-						case Mpa:                            // 1N = 100cN   N/mm2 = Mpa
+						case Mpa:                                                  // 1N = 100cN   N/mm2 = Mpa
 							distemp = distemp * Holding.RegS.Standard * 9800;
 			        Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
-						  Input.RegS.StartForce = (startforceADtemp - Holding.RegS.ZeroScaleAD) * Holding.RegS.Standard * 9800;   // 初始模量
+						
+						  // 初始模量
+						  distemp = startforceADtemp - Holding.RegS.ZeroScaleAD;   // 计算中间值
+	            if(distemp >= 60000)distemp = 0;
+						  distemp = distemp * Holding.RegS.Standard * 9800;   // 初始模量
+						  Input.RegS.StartForce = distemp / strDisSta;        // 初始模量
 						  
               Mtemp = ((uint32_t)Input.RegS.BreakingForce & 0xffff);
 							Mtemp = Mtemp * 10 / (Holding.RegS.TEX >> 1);
 						  Mtemp = Mtemp * 10 / (Holding.RegS.TEX >> 1);
 						  Mtemp = Mtemp / 314;
 						
-						  Input.RegS.BreakingTenacity = Mtemp;   // 断裂强度
+						  Input.RegS.BreakingTenacity = Mtemp;                // 断裂强度
 			      break;
 	        }
 				}
@@ -267,7 +273,7 @@ static void Zero_GPIO_Configuration(void)
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5;       // PC2
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING; 	             // 上拉输入
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING; 	     // 上拉输入
   GPIO_Init(GPIOC, &GPIO_InitStructure);	
 
 
@@ -278,7 +284,7 @@ static void Zero_GPIO_Configuration(void)
   	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);  
 
 	//设置EXTI12 EXTI14优先级	  
-  	NVIC_InitStructure.NVIC_IRQChannel = EXTI4_IRQn ;          //中断通道
+  	NVIC_InitStructure.NVIC_IRQChannel = EXTI4_IRQn ;           //中断通道
   	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority =  2;  //强占优先级
   	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;          //次优先级
   	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;             //通道中断使能

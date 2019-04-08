@@ -291,6 +291,8 @@ void Read_HoldingRegister()
 	}
 
 	TxEnable_Flag = 1;       // 允许发送
+	
+	if((starttemp + counttemp) >= 20)Holding.RegS.SysCode = NoTest;  // 标志位清零，触摸屏专用
 }
 
 /********************************************************************************

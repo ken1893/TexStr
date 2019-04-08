@@ -17,7 +17,7 @@
 * Input          : None
 * Output         : None
 * Return         : None
-* Attention		 : None
+* Attention		   : None
 *******************************************************************************/
 void I2C_Configuration(void)
 {

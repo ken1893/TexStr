@@ -84,6 +84,12 @@ enum UnitType {
 	Mpa                  // 
 };
 
+enum TimesType {
+	NoTest = 0,
+	Once = 1,          // once
+	Last = 3           // last
+};
+
 
 /* Time constant for the delay caclulation allowing to have a millisecond 
    incrementing counter. This value should be equal to (System Clock / 1000).
@@ -127,10 +133,10 @@ union HOLDREG_U
 		
 		u16 tDisplay;		     //  强力显示				                   F		R
 		u16 FullScaleAD;     //  满度校准值						            10		R
-		u16 ZeroScaleAD;     //  零度校准值                       11   R
+		u16 ZeroScaleAD;     //  零度校准值                       11    R
 		
 		u16 End_ID;          //  系统                            12		R/W
-		u16 tErrorCode;      //  错误代码			                  13
+		u16 SysCode;         //  系统代码			                   13   19
 		
 	}RegS;
 };
@@ -153,9 +159,9 @@ union INPUTREG_U
 		unsigned int Elongation;          //  7  断裂伸长率 breaking elongation 
 		unsigned int BreakTime;           //  8  断裂时间   
 		
-		unsigned int StartForce;           // 9  初始模量
+		unsigned int StartForce;          //  9  初始模量
 		
-		unsigned int ErrorCode;               //  A  error code
+		unsigned int ErrorCode;           //  A  error code
 		unsigned int Null3;               //  B
 		unsigned int PF;                  //  C
 
@@ -182,8 +188,10 @@ BLINK_EXT u16 RecordAction;          // 记录上一个动作
 BLINK_EXT __IO uint32_t allmove;     // 电机运行总pulse
 BLINK_EXT __IO uint32_t backmove;    // 测试时回的pulse
 BLINK_EXT __IO uint8_t  stepmove;    // 当前频率pulse,台阶W
+BLINK_EXT uint8_t TexTestTimes;      // 测试状态值
 
-BLINK_EXT uint8_t  GuanTimes_Cache;   
+BLINK_EXT uint8_t  GuanTimes_Cache;  // 每管次数缓存
+BLINK_EXT uint8_t  Guan_Cache;       // 每次试验测试管数缓存
 
 enum SpeedType {
     UP,        // 
@@ -226,6 +234,19 @@ COLLECT_EXT uint8_t timetemp;           // 试验时间计数
 COLLECT_EXT uint16_t startforcetemp;    // 初始模量长度缓存
 COLLECT_EXT uint16_t startforceADtemp;    // 初始模量AD缓存
 
+COLLECT_EXT uint16_t ResultTEX[200][2];   // 测试结果存储
+
+#ifdef PRINT_GLOBALS
+#define PRINT_EXT
+#else 
+#define PRINT_EXT extern
+#endif 
+
+PRINT_EXT void hangjianju(void);
+PRINT_EXT void shuipingzhaobiao(void);
+PRINT_EXT void Usart_SendString(USART_TypeDef *USARTx, unsigned char *str, unsigned short len);
+PRINT_EXT void UsartPrintf(USART_TypeDef *USARTx, char *fmt,...);
+PRINT_EXT void Uart2_SendChar(uint8_t Ch);
 
 #ifdef CYCSEND_GLOBALS
 #define CYCSEND_EXT
