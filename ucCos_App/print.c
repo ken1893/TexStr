@@ -9,16 +9,53 @@
 #include <stdio.h>
 
 /*************************行间距例程************************************/
+void PrintHead(void)
+{
+	Uart2_SendChar(0x1b);Uart2_SendChar(0x40);   //初始化打印机
+	Uart2_SendChar(0x1b);Uart2_SendChar(0x38);Uart2_SendChar(0x00);   	//调用16*16点阵汉字，24点阵为24*24
+	
+
+	UsartPrintf(USART2,"电子单纤维强力机试验报告: \n");
+	//Uart2_SendChar(0x0c);   // change page
+	
+	//Uart2_SendChar(27);Uart2_SendChar(64);Uart2_SendChar(10); 
+	//UsartPrintf(USART2,"01234567890123456789012345678901234567890123456789012345678901234567890123456789");
+	//Uart2_SendChar(27);Uart2_SendChar(64);Uart2_SendChar(13);
+	//UsartPrintf(USART2,"a1234567890123456789012345678901234567890123456789012345678901234567890123456789z");
+	
+	//Uart2_SendChar(0x1b);Uart2_SendChar('C');Uart2_SendChar(0);Uart2_SendChar(11);   // 以行为单位设定页长，英寸
+	
+	Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
+	UsartPrintf(USART2,"日期:00/01/01		时间:00:00:00		温度:25		湿度");//打印字串
+	
+	Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
+	UsartPrintf(USART2,"夹持长度:mm		拉伸速度:mm/min		试验次数:25		试验员");//打印字串
+	
+	Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
+	UsartPrintf(USART2,"采样直径:mm		力降:%		试验单位");//打印字串
+	
+	Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
+	//Uart2_SendChar(0x1b);Uart2_SendChar('I');Uart2_SendChar(10);
+	//Uart2_SendChar(0x1b);Uart2_SendChar('Q');Uart2_SendChar(100);
+	
+	//Uart2_SendChar(0x1b);Uart2_SendChar('I');Uart2_SendChar(0);
+	//UsartPrintf(USART2,"01234567890123456789012345678901234567890123456789012345678901234567890123456789");											 //打印字符串
+	//Uart2_SendChar(0x1b);Uart2_SendChar('I');Uart2_SendChar(136);
+	//UsartPrintf(USART2,"LONG              SPEED              TIMES");
+
+}
+
+/*************************行间距例程************************************/
 void hangjianju(void)
 {
 	uint8_t i;
 	Uart2_SendChar(0x1b);Uart2_SendChar(0x38);Uart2_SendChar(0x00);   	// 调用16*16点阵汉字，24点阵为24*24
-	UsartPrintf(USART2,"行间距测试：\n");
+	UsartPrintf(USART2,"试验次数	断裂强力	断裂伸长	断裂强度	断裂伸长率	断裂时间	初始模量\n");
 	//print_chs("行间距测试：\n");
 	for(i=0;i<11;i=i+2)			 //循环打印
 	{
 		Uart2_SendChar(0x1b);Uart2_SendChar(0x31);Uart2_SendChar(i);		  // ESC 1，设置行间距
-		UsartPrintf(USART2,"LINE SPACING");
+		UsartPrintf(USART2,"012345678901234567890123456789012345678901234567890123456789");
 		//print_chs("LINE SPACING");
 	//	print(0x0a);   //打印字符串和换行
 	}
@@ -27,18 +64,40 @@ void hangjianju(void)
 /*************************水平造表例程***************************************/
 void shuipingzhaobiao(void)
 {
+	uint8_t i;
+	
+	Uart2_SendChar(0x1b);Uart2_SendChar(0x40);					   //初始化打印机
 	Uart2_SendChar(0x1b);Uart2_SendChar(0x38);Uart2_SendChar(0x00);   	//调用16*16点阵汉字，24点阵为24*24
-	UsartPrintf(USART2,"水平造表测试：\n");
-	UsartPrintf(USART2,"1234567890123456");//   '标尺
-//	print(0x0d);
-	Uart2_SendChar(0x1b);Uart2_SendChar(0x44);Uart2_SendChar(2);Uart2_SendChar(9);Uart2_SendChar(14);Uart2_SendChar(0);//ESC  D
-	Uart2_SendChar(9);            										 //HT命令
-	UsartPrintf(USART2,"HT1");											 //打印字符串
-	Uart2_SendChar(9);													 //HT命令
-	UsartPrintf(USART2,"HT2");											 //打印字符串
-	Uart2_SendChar(9);													 //HT命令
-	UsartPrintf(USART2,"HT3");											 //打印字符串
-	Uart2_SendChar(0x0d);
+	
+	UsartPrintf(USART2,"试验次数	断裂强力	断裂伸长	断裂强度	断裂伸长率	断裂时间	初始模量\n");
+	Uart2_SendChar(27);Uart2_SendChar(64);Uart2_SendChar(10); 
+	UsartPrintf(USART2,"	cN	mm	Mpa	%	S	Mpa");//标尺
+	//Uart2_SendChar(0x1b);Uart2_SendChar(0x51);Uart2_SendChar(0x12);          //ESC  Q 命令，右限为6
+	
+	for(i=0;i<10;i++)
+	{
+		Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
+	  UsartPrintf(USART2,"%d b 12345678901234567890123456789012 z",i);//打印字串
+	}
+	
+	//Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
+	//UsartPrintf(USART2,"b 12345678901234567890123456789012 z");//打印字串
+	
+	//Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
+	//UsartPrintf(USART2,"c 12345678901234567890123456789012 zaaaaaaaaaaaaaaaaa");//打印字串
+	
+	//Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
+	//UsartPrintf(USART2,"d 12345678901234567890123456789012 zddddddddddddddddd");//打印字串
+	
+	//Uart2_SendChar(27);Uart2_SendChar(64);Uart2_SendChar(10);								  //回车
+	
+	//Uart2_SendChar(0x1b);Uart2_SendChar(0x40);					  //初始化打印机
+	//Uart2_SendChar(0x1b);Uart2_SendChar(0x38);Uart2_SendChar(0x00);   	//调用16*16点阵汉字，24点阵为24*24
+	//UsartPrintf(USART2,"电子单纤维强力机试验报告:\n");
+	//UsartPrintf(USART2,"12345678901234567890123456789012");//标尺
+	//Uart2_SendChar(0x1b);Uart2_SendChar(0x6c);Uart2_SendChar(0x06);		  //ESC I 命令，左限为6
+	//UsartPrintf(USART2,"12345678901234567890123456789012");//打印字串
+	//Uart2_SendChar(0x0d);								  //回车
 }
 
 void Uart2_SendChar(uint8_t Ch)

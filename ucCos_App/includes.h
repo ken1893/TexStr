@@ -242,6 +242,7 @@ COLLECT_EXT uint16_t ResultTEX[200][2];   // ²âÊÔ½á¹û´æ´¢
 #define PRINT_EXT extern
 #endif 
 
+PRINT_EXT void PrintHead(void);
 PRINT_EXT void hangjianju(void);
 PRINT_EXT void shuipingzhaobiao(void);
 PRINT_EXT void Usart_SendString(USART_TypeDef *USARTx, unsigned char *str, unsigned short len);

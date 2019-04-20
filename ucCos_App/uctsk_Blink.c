@@ -30,6 +30,7 @@ static void LED_GPIO_Configuration (void);	  // LED显示IO初始化
 static void PWM_GPIO_Configuration(void);     // 脉冲输出IO初始化
 static void Tim3_Configuration(void);         // 时钟3初始化 PA6  TIM3_CH1
 //static void Tim5_Configuration(void);       // TIM5_CH2
+
 static void UART1_Configuration(INT32U baud_rate);		  //  
 static void Usart2_Init(INT32U baud);
 
@@ -195,7 +196,7 @@ static void uctsk_Blink (void)
 					  strDisSta = Holding.RegS.FullScaleAD - Holding.RegS.ZeroScaleAD;    // 计算校准力值对应计算值
 					  Flag_Save = 1;
 					  RecordAction = ZEROSCALE;
-					  hangjianju();
+					  shuipingzhaobiao();
 						break;
 					
 					case FULLSCALE:
@@ -203,7 +204,7 @@ static void uctsk_Blink (void)
 					  strDisSta = Holding.RegS.FullScaleAD - Holding.RegS.ZeroScaleAD;    // 计算校准力值对应计算值
 					  Flag_Save = 1;
 					  RecordAction = FULLSCALE;
-					  shuipingzhaobiao();
+					  PrintHead();
 						break;
 				
 					default:break;
