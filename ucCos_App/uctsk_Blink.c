@@ -135,11 +135,12 @@ static void uctsk_Blink (void)
 							if(Holding.RegS.GuanTimes != 0)
 							{
 								Holding.RegS.GuanTimes--;
-								TexTestTimes = Once;
+								//TexTestTimes = Once;
 								if(Holding.RegS.GuanTimes == 0)
 								{
-									TexTestTimes = Last;
+									//TexTestTimes = Last;       // 一管结束，计算结果
 									Holding.RegS.GuanCount--;
+									
 									if(Holding.RegS.GuanCount != 0)Holding.RegS.GuanTimes = GuanTimes_Cache;
 								}
 								Action_Flag = EXAM_1;   // 进入测试
@@ -196,7 +197,7 @@ static void uctsk_Blink (void)
 					  strDisSta = Holding.RegS.FullScaleAD - Holding.RegS.ZeroScaleAD;    // 计算校准力值对应计算值
 					  Flag_Save = 1;
 					  RecordAction = ZEROSCALE;
-					  shuipingzhaobiao();
+					  
 						break;
 					
 					case FULLSCALE:
@@ -204,7 +205,12 @@ static void uctsk_Blink (void)
 					  strDisSta = Holding.RegS.FullScaleAD - Holding.RegS.ZeroScaleAD;    // 计算校准力值对应计算值
 					  Flag_Save = 1;
 					  RecordAction = FULLSCALE;
-					  PrintHead();
+					  
+						break;
+					
+					case PRINT:
+						PrintHead();
+					  PrintBody();
 						break;
 				
 					default:break;

@@ -26,15 +26,18 @@ void PrintHead(void)
 	//Uart2_SendChar(0x1b);Uart2_SendChar('C');Uart2_SendChar(0);Uart2_SendChar(11);   // 以行为单位设定页长，英寸
 	
 	Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
-	UsartPrintf(USART2,"日期:00/01/01		时间:00:00:00		温度:25		湿度");//打印字串
+	UsartPrintf(USART2,"日期:00/01/01  	时间:00:00:00  	温度:25  	湿度\n");//打印字串
 	
-	Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
-	UsartPrintf(USART2,"夹持长度:mm		拉伸速度:mm/min		试验次数:25		试验员");//打印字串
+	//Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
+	UsartPrintf(USART2,"夹持长度:mm  	拉伸速度:mm/min  	试验次数:25  	试验员\n");//打印字串
 	
-	Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
-	UsartPrintf(USART2,"采样直径:mm		力降:%		试验单位");//打印字串
+	//Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
+	UsartPrintf(USART2,"采样直径:mm  	力降:%  	试验单位\n");//打印字串
 	
-	Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
+	//Uart2_SendChar(27);Uart2_SendChar(64);Uart2_SendChar(10);     // 断落大间距
+	
+	Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换行
+	
 	//Uart2_SendChar(0x1b);Uart2_SendChar('I');Uart2_SendChar(10);
 	//Uart2_SendChar(0x1b);Uart2_SendChar('Q');Uart2_SendChar(100);
 	
@@ -43,6 +46,59 @@ void PrintHead(void)
 	//Uart2_SendChar(0x1b);Uart2_SendChar('I');Uart2_SendChar(136);
 	//UsartPrintf(USART2,"LONG              SPEED              TIMES");
 
+}
+
+
+/*************************水平造表例程***************************************/
+void PrintBody(void)
+{
+	uint8_t i,j;
+	
+	//Guan_Cache;        // 管数
+	//GuanTimes_Cache;   // 次数
+	
+	Uart2_SendChar(0x1b);Uart2_SendChar(0x40);					   //初始化打印机
+	Uart2_SendChar(0x1b);Uart2_SendChar(0x38);Uart2_SendChar(0x00);   	//调用16*16点阵汉字，24点阵为24*24
+	
+	
+	UsartPrintf(USART2,"试验次数	断裂强力	断裂伸长	断裂强度	断裂伸长率	断裂时间	初始模量\n");
+	//Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换行
+	
+	UsartPrintf(USART2,"	cN	mm	Mpa	%	S	Mpa");//标尺
+	//Uart2_SendChar(0x1b);Uart2_SendChar(0x51);Uart2_SendChar(0x12);          //ESC  Q 命令，右限为6
+	
+	Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
+	
+	for(i=0;i<Guan_Cache;i++)    // 管数
+	{
+		for(j = 0;j<GuanTimes_Cache;j++)
+		{
+			uint8_t ttemp = i * Guan_Cache + j;
+			UsartPrintf(USART2,"%d  %d	%d	%d	%d\n",i+1,j+1,ResultTEX[ttemp][0],ResultTEX[ttemp][1],ResultTEX[ttemp][2]);//打印字串
+		}
+		UsartPrintf(USART2,"平均值 b 12345678901234567890123456789012 z\n");//打印字串
+		UsartPrintf(USART2,"CV值 b 12345678901234567890123456789012 z\n");//打印字串
+		UsartPrintf(USART2,"\n");//回车
+	}
+	
+	//Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
+	//UsartPrintf(USART2,"b 12345678901234567890123456789012 z");//打印字串
+	
+	//Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
+	//UsartPrintf(USART2,"c 12345678901234567890123456789012 zaaaaaaaaaaaaaaaaa");//打印字串
+	
+	//Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
+	//UsartPrintf(USART2,"d 12345678901234567890123456789012 zddddddddddddddddd");//打印字串
+	
+	//Uart2_SendChar(27);Uart2_SendChar(64);Uart2_SendChar(10);								  //回车
+	
+	//Uart2_SendChar(0x1b);Uart2_SendChar(0x40);					  //初始化打印机
+	//Uart2_SendChar(0x1b);Uart2_SendChar(0x38);Uart2_SendChar(0x00);   	//调用16*16点阵汉字，24点阵为24*24
+	//UsartPrintf(USART2,"电子单纤维强力机试验报告:\n");
+	//UsartPrintf(USART2,"12345678901234567890123456789012");//标尺
+	//Uart2_SendChar(0x1b);Uart2_SendChar(0x6c);Uart2_SendChar(0x06);		  //ESC I 命令，左限为6
+	//UsartPrintf(USART2,"12345678901234567890123456789012");//打印字串
+	//Uart2_SendChar(0x0d);								  //回车
 }
 
 /*************************行间距例程************************************/
@@ -69,15 +125,17 @@ void shuipingzhaobiao(void)
 	Uart2_SendChar(0x1b);Uart2_SendChar(0x40);					   //初始化打印机
 	Uart2_SendChar(0x1b);Uart2_SendChar(0x38);Uart2_SendChar(0x00);   	//调用16*16点阵汉字，24点阵为24*24
 	
+	
 	UsartPrintf(USART2,"试验次数	断裂强力	断裂伸长	断裂强度	断裂伸长率	断裂时间	初始模量\n");
-	Uart2_SendChar(27);Uart2_SendChar(64);Uart2_SendChar(10); 
+	//Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换行
+	
 	UsartPrintf(USART2,"	cN	mm	Mpa	%	S	Mpa");//标尺
 	//Uart2_SendChar(0x1b);Uart2_SendChar(0x51);Uart2_SendChar(0x12);          //ESC  Q 命令，右限为6
 	
+	Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
 	for(i=0;i<10;i++)
 	{
-		Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
-	  UsartPrintf(USART2,"%d b 12345678901234567890123456789012 z",i);//打印字串
+	  UsartPrintf(USART2,"%d b 12345678901234567890123456789012 z\n",i);//打印字串
 	}
 	
 	//Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行

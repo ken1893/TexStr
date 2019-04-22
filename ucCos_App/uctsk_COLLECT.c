@@ -74,6 +74,7 @@ static  void    uctsk_COLLECT(void *pdata)
 	strDisSta = Holding.RegS.FullScaleAD - Holding.RegS.ZeroScaleAD;    // 计算校准力值对应计算值
 
 	GuanTimes_Cache = Holding.RegS.GuanTimes;
+	Guan_Cache = Holding.RegS.GuanCount;
 	
 	// 计算夹持长度对应电机运行步数
 	ZeroMove = (Holding.RegS.CycleNum / LEAD) * Holding.RegS.StepLong * 2;
@@ -132,7 +133,7 @@ static void vHandler_collect(void)
 		}
 		
 		Input.RegS.Length = (LEAD * allmove * 10 / Holding.RegS.StepLong) >> 1;          // 断裂伸长
-	  Input.RegS.Elongation = (Input.RegS.Length * 100) / Holding.RegS.CycleNum;        // 断裂伸长率
+	  Input.RegS.Elongation = (Input.RegS.Length * 100) / Holding.RegS.CycleNum;       // 断裂伸长率
 		
 		if(allmove >= startforcetemp && startforceADtemp == 0)   // and only can calc one times    1%
 		{
@@ -160,13 +161,14 @@ static void vHandler_collect(void)
 				else 
 				{
 					Action_Flag = EXAM_2;            // 停止		
-					Holding.RegS.SysCode = TexTestTimes;    // 一次测试结束或一管测试结束标志
+					//Holding.RegS.SysCode = TexTestTimes;    // 一次测试结束或一管测试结束标志
 					
 					// 拉停长度 (伸长)
 					TexMove = allmove;               // 拉断伸长，recorde 脉冲数，记录测试伸长量,用于计算
 					Input.RegS.Length = (LEAD * TexMove * 10 / Holding.RegS.StepLong) >> 1;          // 断裂伸长
 					//distemp = Input.RegS.Length * 100;     // 计算中间值
-					Input.RegS.Elongation = (Input.RegS.Length * 100) / Holding.RegS.CycleNum;        // 断裂伸长率
+					Input.RegS.Elongation = (Input.RegS.Length * 100) / Holding.RegS.CycleNum;       // 断裂伸长率
+					
 					
 					// 根据计量单位，采集AD结果，计算出重力表示值
 	        distemp = adcMax - Holding.RegS.ZeroScaleAD;  // 计算中间值
@@ -214,6 +216,18 @@ static void vHandler_collect(void)
 						  Input.RegS.BreakingTenacity = Mtemp;                // 断裂强度
 			      break;
 	        }
+					ResultTEX[TestTimesRecord][0] = Input.RegS.BreakingForce;   // 断裂强力
+					ResultTEX[TestTimesRecord][1] = Input.RegS.Length;          // 断裂伸长
+					ResultTEX[TestTimesRecord][2] = Input.RegS.Elongation;      // 断裂伸长率
+					
+					if(TestTimesRecord >= ((GuanTimes_Cache * Guan_Cache)-1))
+					{
+						TestTimesRecord = 0;
+					}
+					else 
+					{
+						TestTimesRecord++;
+					}
 				}
 			}
 		}

@@ -322,7 +322,7 @@ void Write_SingleHolding()
 				break;
 			
 			case 11:    // 测试管数
-	
+				Guan_Cache = Holding.RegI[add];
 				break;
 		
 			case 12:    // 测试次数
