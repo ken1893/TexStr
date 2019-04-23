@@ -69,7 +69,8 @@ static  void    uctsk_COLLECT(void *pdata)
 	sampleCount = 0;       // sample count init
 	Sum_adc = 0;
 	
-	Holding.RegS.Unit = Mpa;     // 
+	//Holding.RegS.Unit = Mpa;     // 
+	
 	TestTimesRecord = 0;
 	
 	strDisSta = Holding.RegS.FullScaleAD - Holding.RegS.ZeroScaleAD;    // 计算校准力值对应计算值
@@ -194,6 +195,7 @@ static void vHandler_collect(void)
 		        case Kilogram:
 			        distemp = distemp * Holding.RegS.Standard * 10;
 			        Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
+							Input.RegS.BreakingTenacity = Input.RegS.BreakingForce / Holding.RegS.TEX;   // 断裂强度
 			        break;
 		
 		        case Pound:
@@ -217,6 +219,7 @@ static void vHandler_collect(void)
 						  Input.RegS.BreakingTenacity = Mtemp;                // 断裂强度
 			      break;
 	        }
+					
 					if(TestTimesRecord >= (Guan_Cache * GuanTimes_Cache))TestTimesRecord = 0;
 					
 					ResultTEX[TestTimesRecord][0] = Input.RegS.BreakingForce;    // 断裂强力
@@ -238,6 +241,8 @@ static void vHandler_collect(void)
 	{
 		distemp = 0;
 	}
+	// 显示默认一位有效数字
+	// 以下实时显示强力值
 	switch(Holding.RegS.Unit)   // 显示实时值，强力值，拉伸值
 	{
 		case Newton:

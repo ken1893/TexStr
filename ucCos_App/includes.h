@@ -56,6 +56,7 @@
 #define LEAD        5 
 #define difMax      100       // 容差
 #define PWMCORECLK  36000000
+#define PC          10        // point count 小数位数
 
 
 // 设备动作
@@ -78,8 +79,9 @@ enum ActionType {
 };
 
 // 单位选择
+// Holding.RegS.Unit
 enum UnitType {
-	Newton = 1,          // N  1
+	Newton = 0,          // N  0
 	cNewton,             // cN
 	Kilogram,            // kg
 	Pound,               // lb
@@ -185,6 +187,11 @@ MAIN_EXT union INPUTREG_U Input;     //
 
 //--------------------------------------------------------------------------------
 // for motion
+enum SpeedType {   
+    UP,        // 
+    DOWN       // 
+};
+
 BLINK_EXT u16 Action_Flag;           // 动作标志
 BLINK_EXT u16 RecordAction;          // 记录上一个动作
 
@@ -192,17 +199,11 @@ BLINK_EXT __IO uint32_t allmove;     // 电机运行总pulse
 BLINK_EXT __IO uint32_t backmove;    // 测试时回的pulse
 BLINK_EXT __IO uint8_t  stepmove;    // 当前频率pulse,台阶W
 
-
 BLINK_EXT uint8_t TexTestTimes;      // 测试状态值
 
 BLINK_EXT uint8_t  TestTimesRecord;  // 总试验次数记录
 BLINK_EXT uint8_t  GuanTimes_Cache;  // 每管次数缓存
 BLINK_EXT uint8_t  Guan_Cache;       // 每次试验测试管数缓存
-
-enum SpeedType {
-    UP,        // 
-    DOWN       // 
-};
 
 BLINK_EXT uint8_t ExamS_Flag;   // 测试时加减速转折点标志
 BLINK_EXT uint8_t Current_Fre;      
@@ -250,6 +251,7 @@ COLLECT_EXT uint16_t ResultTEX[200][6];   // 测试结果存储
 #define PRINT_EXT extern
 #endif 
 
+PRINT_EXT void PrintBottom(void);
 PRINT_EXT void PrintBody(void);
 PRINT_EXT void PrintHead(void);
 PRINT_EXT void hangjianju(void);
@@ -257,6 +259,12 @@ PRINT_EXT void shuipingzhaobiao(void);
 PRINT_EXT void Usart_SendString(USART_TypeDef *USARTx, unsigned char *str, unsigned short len);
 PRINT_EXT void UsartPrintf(USART_TypeDef *USARTx, char *fmt,...);
 PRINT_EXT void Uart2_SendChar(uint8_t Ch);
+
+// 专用，待调整
+PRINT_EXT uint16_t MAXSel(uint8_t A,uint8_t C);    // Array  Count
+PRINT_EXT uint16_t MINSel(uint8_t A,uint8_t C);    // Array  Count
+PRINT_EXT uint16_t AVerSel(uint8_t A,uint8_t C);    // Array  Count
+
 
 #ifdef CYCSEND_GLOBALS
 #define CYCSEND_EXT

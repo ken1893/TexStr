@@ -211,6 +211,7 @@ static void uctsk_Blink (void)
 					case PRINT:
 						PrintHead();
 					  PrintBody();
+					  PrintBottom();
 						break;
 				
 					default:break;

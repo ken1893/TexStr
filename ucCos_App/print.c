@@ -49,7 +49,7 @@ void PrintHead(void)
 }
 
 
-/*************************水平造表例程***************************************/
+/*************************打印测试中间值***************************************/
 void PrintBody(void)
 {
 	uint8_t i,j;
@@ -90,7 +90,7 @@ void PrintBody(void)
 			sumtemp[4] += ResultTEX[ttemp][4];
 			sumtemp[5] += ResultTEX[ttemp][5];
 			
-			UsartPrintf(USART2,"%d  %d	%d.%d	%d.%d	%d.%d	%d	%d.%d	%d.%d\n",i+1,j+1,ResultTEX[ttemp][0]/100,ResultTEX[ttemp][0]%100,ResultTEX[ttemp][1]/100,ResultTEX[ttemp][1]%100,ResultTEX[ttemp][2]/100,ResultTEX[ttemp][2]%100,ResultTEX[ttemp][3],ResultTEX[ttemp][4]/100,ResultTEX[ttemp][4]%100,ResultTEX[ttemp][5]/100,ResultTEX[ttemp][5]%100);//打印字串
+			UsartPrintf(USART2,"%d  %d	%d.%d	%d.%d	%d.%d	%d	%d.%d	%d.%d\n",i+1,j+1,ResultTEX[ttemp][0]/PC,ResultTEX[ttemp][0]%PC,ResultTEX[ttemp][1]/PC,ResultTEX[ttemp][1]%PC,ResultTEX[ttemp][2]/PC,ResultTEX[ttemp][2]%PC,ResultTEX[ttemp][3],ResultTEX[ttemp][4]/PC,ResultTEX[ttemp][4]%PC,ResultTEX[ttemp][5]/PC,ResultTEX[ttemp][5]%PC);//打印字串
 		}
 		
 		sumtemp[0] = sumtemp[0] / GuanTimes_Cache;    // average
@@ -100,29 +100,100 @@ void PrintBody(void)
 		sumtemp[4] = sumtemp[4] / GuanTimes_Cache;
 		sumtemp[5] = sumtemp[5] / GuanTimes_Cache;
 		
-		UsartPrintf(USART2,"平均值 	%d.%d	%d.%d	%d.%d	%d	%d.%d	%d.%d\n",sumtemp[0]/100,sumtemp[0]%100,sumtemp[1]/100,sumtemp[1]%100,sumtemp[2]/100,sumtemp[2]%100,sumtemp[3],sumtemp[4]/100,sumtemp[4]%100,sumtemp[5]/100,sumtemp[5]%100);//打印字串
+		UsartPrintf(USART2,"平均值 	%d.%d	%d.%d	%d.%d	%d	%d.%d	%d.%d\n",sumtemp[0]/PC,sumtemp[0]%PC,sumtemp[1]/PC,sumtemp[1]%PC,sumtemp[2]/PC,sumtemp[2]%PC,sumtemp[3],sumtemp[4]/PC,sumtemp[4]%PC,sumtemp[5]/PC,sumtemp[5]%PC);//打印字串
 		UsartPrintf(USART2,"CV值 b 12345678901234567890123456789012 z\n");//打印字串
 		UsartPrintf(USART2,"\n");//回车
 	}
+}
+
+//--------------------------------------------------------------------------------
+ uint16_t MAXSel(uint8_t A,uint8_t C)    // Array  Count
+{
+	uint16_t Mtemp;
+	uint8_t i;
 	
-	//Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
-	//UsartPrintf(USART2,"b 12345678901234567890123456789012 z");//打印字串
+	for(i=0;i<C;i++)
+	{
+		if(ResultTEX[i][A] > Mtemp)Mtemp = ResultTEX[i][A];
+	}
 	
-	//Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
-	//UsartPrintf(USART2,"c 12345678901234567890123456789012 zaaaaaaaaaaaaaaaaa");//打印字串
+	return Mtemp;
+}
+
+//--------------------------------------------------------------------------------
+ uint16_t MINSel(uint8_t A,uint8_t C)    // Array  Count
+{
+	uint16_t Mtemp;
+	uint8_t i;
 	
-	//Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
-	//UsartPrintf(USART2,"d 12345678901234567890123456789012 zddddddddddddddddd");//打印字串
+	Mtemp = ResultTEX[0][A];
 	
-	//Uart2_SendChar(27);Uart2_SendChar(64);Uart2_SendChar(10);								  //回车
+	for(i=0;i<C;i++)
+	{
+		if(ResultTEX[i][A] < Mtemp)Mtemp = ResultTEX[i][A];
+	}
 	
-	//Uart2_SendChar(0x1b);Uart2_SendChar(0x40);					  //初始化打印机
-	//Uart2_SendChar(0x1b);Uart2_SendChar(0x38);Uart2_SendChar(0x00);   	//调用16*16点阵汉字，24点阵为24*24
-	//UsartPrintf(USART2,"电子单纤维强力机试验报告:\n");
-	//UsartPrintf(USART2,"12345678901234567890123456789012");//标尺
-	//Uart2_SendChar(0x1b);Uart2_SendChar(0x6c);Uart2_SendChar(0x06);		  //ESC I 命令，左限为6
-	//UsartPrintf(USART2,"12345678901234567890123456789012");//打印字串
-	//Uart2_SendChar(0x0d);								  //回车
+	return Mtemp;
+}
+
+//--------------------------------------------------------------------------------
+ uint16_t AVerSel(uint8_t A,uint8_t C)    // Array  Count
+{
+	uint32_t Mtemp;
+	uint8_t i;
+	
+	for(i=0;i<C;i++)
+	{
+		Mtemp += ResultTEX[i][A];
+	}
+	
+	return Mtemp/C;
+}
+
+
+/*************************打印测试中间值***************************************/
+void PrintBottom(void)
+{
+	uint8_t i;
+	uint16_t sumtemp[6];
+		sumtemp[0] = 0;
+		sumtemp[1] = 0;
+		sumtemp[2] = 0;
+		sumtemp[3] = 0;
+		sumtemp[4] = 0;
+		sumtemp[5] = 0;
+	
+	Uart2_SendChar(0x1b);Uart2_SendChar(0x40);					   //初始化打印机
+	Uart2_SendChar(0x1b);Uart2_SendChar(0x38);Uart2_SendChar(0x00);   	//调用16*16点阵汉字，24点阵为24*24
+	
+	UsartPrintf(USART2,"	**统计报表**\n");
+	UsartPrintf(USART2," 	断裂强力	断裂伸长	断裂强度	断裂伸长率	断裂时间	初始模量\n");
+	
+	UsartPrintf(USART2,"	cN	mm	Mpa	%%	S	Mpa");//标尺
+	
+	Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
+	
+	for(i=0;i<6;i++)
+	{
+		sumtemp[i] = MAXSel(i,GuanTimes_Cache * Guan_Cache);
+	}
+	UsartPrintf(USART2,"最大值 	%d.%d	%d.%d	%d.%d	%d	%d.%d	%d.%d\n",sumtemp[0]/PC,sumtemp[0]%PC,sumtemp[1]/PC,sumtemp[1]%PC,sumtemp[2]/PC,sumtemp[2]%PC,sumtemp[3],sumtemp[4]/PC,sumtemp[4]%PC,sumtemp[5]/PC,sumtemp[5]%PC);//打印字串
+
+	for(i=0;i<6;i++)
+	{
+		sumtemp[i] = MINSel(i,GuanTimes_Cache * Guan_Cache);
+	}
+	UsartPrintf(USART2,"最小值 	%d.%d	%d.%d	%d.%d	%d	%d.%d	%d.%d\n",sumtemp[0]/PC,sumtemp[0]%PC,sumtemp[1]/PC,sumtemp[1]%PC,sumtemp[2]/PC,sumtemp[2]%PC,sumtemp[3],sumtemp[4]/PC,sumtemp[4]%PC,sumtemp[5]/PC,sumtemp[5]%PC);//打印字串
+
+	for(i=0;i<6;i++)
+	{
+		sumtemp[i] = AVerSel(i,GuanTimes_Cache * Guan_Cache);
+	}
+	
+	UsartPrintf(USART2,"平均值 	%d.%d	%d.%d	%d.%d	%d	%d.%d	%d.%d\n",sumtemp[0]/PC,sumtemp[0]%PC,sumtemp[1]/PC,sumtemp[1]%PC,sumtemp[2]/PC,sumtemp[2]%PC,sumtemp[3],sumtemp[4]/PC,sumtemp[4]%PC,sumtemp[5]/PC,sumtemp[5]%PC);//打印字串
+
+		UsartPrintf(USART2,"\n");//回车
+
 }
 
 /*************************行间距例程************************************/

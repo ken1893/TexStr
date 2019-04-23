@@ -6,6 +6,7 @@
 
 
 1N = 100cN
+
 N/mm2 = Mpa   no
 
 显示一位小数点 ok
