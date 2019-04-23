@@ -70,6 +70,7 @@ static  void    uctsk_COLLECT(void *pdata)
 	Sum_adc = 0;
 	
 	Holding.RegS.Unit = Mpa;     // 
+	TestTimesRecord = 0;
 	
 	strDisSta = Holding.RegS.FullScaleAD - Holding.RegS.ZeroScaleAD;    // 计算校准力值对应计算值
 
@@ -158,7 +159,7 @@ static void vHandler_collect(void)
 				{
 					ExamS_Flag = DOWN;
 				}
-				else 
+				else if(ExamS_Flag == DOWN && Action_Flag != EXAM_2)
 				{
 					Action_Flag = EXAM_2;            // 停止		
 					//Holding.RegS.SysCode = TexTestTimes;    // 一次测试结束或一管测试结束标志
@@ -216,18 +217,16 @@ static void vHandler_collect(void)
 						  Input.RegS.BreakingTenacity = Mtemp;                // 断裂强度
 			      break;
 	        }
-					ResultTEX[TestTimesRecord][0] = Input.RegS.BreakingForce;   // 断裂强力
-					ResultTEX[TestTimesRecord][1] = Input.RegS.Length;          // 断裂伸长
-					ResultTEX[TestTimesRecord][2] = Input.RegS.Elongation;      // 断裂伸长率
+					if(TestTimesRecord >= (Guan_Cache * GuanTimes_Cache))TestTimesRecord = 0;
 					
-					if(TestTimesRecord >= ((GuanTimes_Cache * Guan_Cache)-1))
-					{
-						TestTimesRecord = 0;
-					}
-					else 
-					{
-						TestTimesRecord++;
-					}
+					ResultTEX[TestTimesRecord][0] = Input.RegS.BreakingForce;    // 断裂强力
+					ResultTEX[TestTimesRecord][1] = Input.RegS.Length;           // 断裂伸长
+					ResultTEX[TestTimesRecord][2] = Input.RegS.BreakingTenacity; // 断裂强度
+					ResultTEX[TestTimesRecord][3] = Input.RegS.Elongation;       // 断裂伸长率
+					ResultTEX[TestTimesRecord][4] = Input.RegS.BreakTime;        // time
+					ResultTEX[TestTimesRecord][5] = Input.RegS.StartForce;       // 初始模量
+					
+					TestTimesRecord++;
 				}
 			}
 		}

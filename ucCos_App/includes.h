@@ -122,6 +122,7 @@ union HOLDREG_U
 		u16 StepLong;    //  细分			       400 - 50000              7		R/W
 		
 		u16 Distance;       //  长度，夹持距离    Null                8		R/W
+		
 		u16 CycleNum;       //  从零点回止距离/ 1000   0.01-9999.9    9		R/W      长度
 		
 		u16 ForceDrop;      //  力降                                  A(10)		R/W
@@ -240,7 +241,8 @@ COLLECT_EXT uint8_t timetemp;           // 试验时间计数
 COLLECT_EXT uint16_t startforcetemp;      // 初始模量长度缓存
 COLLECT_EXT uint16_t startforceADtemp;    // 初始模量AD缓存
 
-COLLECT_EXT uint16_t ResultTEX[200][3];   // 测试结果存储
+COLLECT_EXT uint16_t ResultTEX[200][6];   // 测试结果存储
+
 
 #ifdef PRINT_GLOBALS
 #define PRINT_EXT

@@ -156,7 +156,7 @@ static void uctsk_Blink (void)
 					  allmove = 0;
 					  ExamS_Flag = UP;
 					  Current_Fre = 0;
-					
+						
 					  adcMax = 0;
 					  Input.RegS.BreakingForce = 0;      
 					  Input.RegS.BreakTime = 0;    // ∂œ¡— ±º‰

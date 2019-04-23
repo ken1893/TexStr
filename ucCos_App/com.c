@@ -323,10 +323,12 @@ void Write_SingleHolding()
 			
 			case 11:    // 测试管数
 				Guan_Cache = Holding.RegI[add];
+			  TestTimesRecord = 0;     // record
 				break;
 		
 			case 12:    // 测试次数
 				GuanTimes_Cache = Holding.RegI[add];
+			  TestTimesRecord = 0;     // record
 				break;
 			
 			case 7:     // 细分

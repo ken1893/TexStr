@@ -15,7 +15,7 @@ void PrintHead(void)
 	Uart2_SendChar(0x1b);Uart2_SendChar(0x38);Uart2_SendChar(0x00);   	//调用16*16点阵汉字，24点阵为24*24
 	
 
-	UsartPrintf(USART2,"电子单纤维强力机试验报告: \n");
+	UsartPrintf(USART2,"		电子单纤维强力机试验报告: \n");
 	//Uart2_SendChar(0x0c);   // change page
 	
 	//Uart2_SendChar(27);Uart2_SendChar(64);Uart2_SendChar(10); 
@@ -29,10 +29,10 @@ void PrintHead(void)
 	UsartPrintf(USART2,"日期:00/01/01  	时间:00:00:00  	温度:25  	湿度\n");//打印字串
 	
 	//Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
-	UsartPrintf(USART2,"夹持长度:mm  	拉伸速度:mm/min  	试验次数:25  	试验员\n");//打印字串
+	UsartPrintf(USART2,"夹持长度:%dmm  	拉伸速度:mm/min  	试验次数:%d  	试验员\n",Holding.RegS.CycleNum,GuanTimes_Cache*Guan_Cache);//打印字串
 	
 	//Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
-	UsartPrintf(USART2,"采样直径:mm  	力降:%  	试验单位\n");//打印字串
+	UsartPrintf(USART2,"采样直径:%dmm  	力降:%d%%  	试验单位\n",Holding.RegS.TEX,Holding.RegS.ForceDrop);//打印字串
 	
 	//Uart2_SendChar(27);Uart2_SendChar(64);Uart2_SendChar(10);     // 断落大间距
 	
@@ -64,19 +64,43 @@ void PrintBody(void)
 	UsartPrintf(USART2,"试验次数	断裂强力	断裂伸长	断裂强度	断裂伸长率	断裂时间	初始模量\n");
 	//Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换行
 	
-	UsartPrintf(USART2,"	cN	mm	Mpa	%	S	Mpa");//标尺
+	UsartPrintf(USART2,"	cN	mm	Mpa	%%	S	Mpa");//标尺
 	//Uart2_SendChar(0x1b);Uart2_SendChar(0x51);Uart2_SendChar(0x12);          //ESC  Q 命令，右限为6
 	
 	Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
 	
 	for(i=0;i<Guan_Cache;i++)    // 管数
 	{
+		uint32_t sumtemp[6];
+		sumtemp[0] = 0;
+		sumtemp[1] = 0;
+		sumtemp[2] = 0;
+		sumtemp[3] = 0;
+		sumtemp[4] = 0;
+		sumtemp[5] = 0;
+		
 		for(j = 0;j<GuanTimes_Cache;j++)
 		{
-			uint8_t ttemp = i * Guan_Cache + j;
-			UsartPrintf(USART2,"%d  %d	%d	%d	%d\n",i+1,j+1,ResultTEX[ttemp][0],ResultTEX[ttemp][1],ResultTEX[ttemp][2]);//打印字串
+			uint8_t ttemp = i * GuanTimes_Cache + j;
+			
+			sumtemp[0] += ResultTEX[ttemp][0];
+			sumtemp[1] += ResultTEX[ttemp][1];
+			sumtemp[2] += ResultTEX[ttemp][2];
+			sumtemp[3] += ResultTEX[ttemp][3];
+			sumtemp[4] += ResultTEX[ttemp][4];
+			sumtemp[5] += ResultTEX[ttemp][5];
+			
+			UsartPrintf(USART2,"%d  %d	%d.%d	%d.%d	%d.%d	%d	%d.%d	%d.%d\n",i+1,j+1,ResultTEX[ttemp][0]/100,ResultTEX[ttemp][0]%100,ResultTEX[ttemp][1]/100,ResultTEX[ttemp][1]%100,ResultTEX[ttemp][2]/100,ResultTEX[ttemp][2]%100,ResultTEX[ttemp][3],ResultTEX[ttemp][4]/100,ResultTEX[ttemp][4]%100,ResultTEX[ttemp][5]/100,ResultTEX[ttemp][5]%100);//打印字串
 		}
-		UsartPrintf(USART2,"平均值 b 12345678901234567890123456789012 z\n");//打印字串
+		
+		sumtemp[0] = sumtemp[0] / GuanTimes_Cache;    // average
+		sumtemp[1] = sumtemp[1] / GuanTimes_Cache;
+		sumtemp[2] = sumtemp[2] / GuanTimes_Cache;
+		sumtemp[3] = sumtemp[3] / GuanTimes_Cache;
+		sumtemp[4] = sumtemp[4] / GuanTimes_Cache;
+		sumtemp[5] = sumtemp[5] / GuanTimes_Cache;
+		
+		UsartPrintf(USART2,"平均值 	%d.%d	%d.%d	%d.%d	%d	%d.%d	%d.%d\n",sumtemp[0]/100,sumtemp[0]%100,sumtemp[1]/100,sumtemp[1]%100,sumtemp[2]/100,sumtemp[2]%100,sumtemp[3],sumtemp[4]/100,sumtemp[4]%100,sumtemp[5]/100,sumtemp[5]%100);//打印字串
 		UsartPrintf(USART2,"CV值 b 12345678901234567890123456789012 z\n");//打印字串
 		UsartPrintf(USART2,"\n");//回车
 	}
@@ -129,7 +153,7 @@ void shuipingzhaobiao(void)
 	UsartPrintf(USART2,"试验次数	断裂强力	断裂伸长	断裂强度	断裂伸长率	断裂时间	初始模量\n");
 	//Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换行
 	
-	UsartPrintf(USART2,"	cN	mm	Mpa	%	S	Mpa");//标尺
+	UsartPrintf(USART2,"	cN	mm	Mpa	\%	S	Mpa");//标尺
 	//Uart2_SendChar(0x1b);Uart2_SendChar(0x51);Uart2_SendChar(0x12);          //ESC  Q 命令，右限为6
 	
 	Uart2_SendChar(0x1b);Uart2_SendChar(0x66);Uart2_SendChar(0x01);Uart2_SendChar(0x0a);			//换6行
