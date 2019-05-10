@@ -54,7 +54,7 @@
 
 
 #define LEAD        5 
-#define difMax      100       // 容差
+#define difMax      70       // 容差
 #define PWMCORECLK  36000000
 #define PC          10        // point count 小数位数
 
@@ -117,17 +117,17 @@ union HOLDREG_U
     u16 Action;             //  Aciton                           2		R/W
 		
 		// ------------------------------------------------------------------------
-		u16 FreS;             //  回零点频率			                    3		R/W     
-		u16 ConstantForce;    //  定强力                              4		R/W
-    u16 FreH9;       //  测试频率       0-85                      5		R/W
-		u16 Steps;       //  速度台阶    目前固定 50    Null          6		R/W
-		u16 StepLong;    //  细分			       400 - 50000              7		R/W
+		u16 FreS;               //  回零点频率			                 3		R/W     
+		u16 ConstantForce;      //  定强力                           4		R/W
+    u16 FreH9;       //  测试频率       0-85                     5		R/W
+		u16 Steps;       //  速度台阶    目前固定 50    Null         6		R/W
+		u16 StepLong;    //  细分			       400 - 50000             7		R/W
 		
-		u16 Distance;       //  长度，夹持距离    Null                8		R/W
+		u16 Distance;       //  长度，夹持距离    Null               8		R/W
 		
-		u16 CycleNum;       //  从零点回止距离/ 1000   0.01-9999.9    9		R/W      长度
+		u16 CycleNum;       //  从零点回止距离/ 1000   0.01-9999.9   9		R/W      长度
 		
-		u16 ForceDrop;      //  力降                                  A(10)		R/W
+		u16 ForceDrop;      //  力降                                 A(10)		R/W
 		
 		// 测试参数
 		u16 GuanCount;       //  测试管数				                   B(11)	  R/W
