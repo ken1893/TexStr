@@ -72,12 +72,22 @@ void PrintBody(void)
 	for(i=0;i<Guan_Cache;i++)    // 管数
 	{
 		uint32_t sumtemp[6];
+		uint32_t CVgemp[6];
+		double temp;
+		
 		sumtemp[0] = 0;
 		sumtemp[1] = 0;
 		sumtemp[2] = 0;
 		sumtemp[3] = 0;
 		sumtemp[4] = 0;
 		sumtemp[5] = 0;
+		
+		CVgemp[0] = 0;
+		CVgemp[1] = 0;
+		CVgemp[2] = 0;
+		CVgemp[3] = 0;
+		CVgemp[4] = 0;
+		CVgemp[5] = 0;
 		
 		for(j = 0;j<GuanTimes_Cache;j++)
 		{
@@ -100,8 +110,28 @@ void PrintBody(void)
 		sumtemp[4] = sumtemp[4] / GuanTimes_Cache;
 		sumtemp[5] = sumtemp[5] / GuanTimes_Cache;
 		
+		// CV 1、求与平均值之差的二次方的和
+		for(j = 0;j<GuanTimes_Cache;j++)
+		{
+			uint8_t ttemp = i * GuanTimes_Cache + j;
+			
+			CVgemp[0] += (ResultTEX[ttemp][0] - sumtemp[0]) * (ResultTEX[ttemp][0] - sumtemp[0]);   // (x - average)2次方
+			CVgemp[1] += (ResultTEX[ttemp][1] - sumtemp[1]) * (ResultTEX[ttemp][1] - sumtemp[1]);
+			CVgemp[2] += (ResultTEX[ttemp][2] - sumtemp[2]) * (ResultTEX[ttemp][2] - sumtemp[2]);
+			CVgemp[3] += (ResultTEX[ttemp][3] - sumtemp[3]) * (ResultTEX[ttemp][3] - sumtemp[3]);
+			CVgemp[4] += (ResultTEX[ttemp][4] - sumtemp[4]) * (ResultTEX[ttemp][4] - sumtemp[4]);
+			CVgemp[5] += (ResultTEX[ttemp][5] - sumtemp[5]) * (ResultTEX[ttemp][5] - sumtemp[5]);
+		}
+
+		CVgemp[0] = sqrt(CVgemp[0] / (GuanTimes_Cache - 1));
+		CVgemp[1] = sqrt(CVgemp[1] / (GuanTimes_Cache - 1));
+		CVgemp[2] = sqrt(CVgemp[2] / (GuanTimes_Cache - 1));
+		CVgemp[3] = sqrt(CVgemp[3] / (GuanTimes_Cache - 1));
+		CVgemp[4] = sqrt(CVgemp[4] / (GuanTimes_Cache - 1));
+		CVgemp[5] = sqrt(CVgemp[5] / (GuanTimes_Cache - 1));
+		
 		UsartPrintf(USART2,"平均值 	%d.%d	%d.%d	%d.%d	%d	%d.%d	%d.%d\n",sumtemp[0]/PC,sumtemp[0]%PC,sumtemp[1]/PC,sumtemp[1]%PC,sumtemp[2]/PC,sumtemp[2]%PC,sumtemp[3],sumtemp[4]/PC,sumtemp[4]%PC,sumtemp[5]/PC,sumtemp[5]%PC);//打印字串
-		UsartPrintf(USART2,"CV值 b 12345678901234567890123456789012 z\n");//打印字串
+		UsartPrintf(USART2,"CV值 %d.%d	%d.%d	%d.%d	%d	%d.%d	%d.%d\n",CVgemp[0]/PC,CVgemp[0]%PC,CVgemp[1]/PC,CVgemp[1]%PC,CVgemp[2]/PC,CVgemp[2]%PC,CVgemp[3],CVgemp[4]/PC,CVgemp[4]%PC,CVgemp[5]/PC,CVgemp[5]%PC);//打印字串
 		UsartPrintf(USART2,"\n");//回车
 	}
 }

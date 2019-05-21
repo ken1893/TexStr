@@ -54,7 +54,7 @@
 
 
 #define LEAD        5 
-#define difMax      70       // 容差
+#define difMax      12       // 容差
 #define PWMCORECLK  36000000
 #define PC          10        // point count 小数位数
 
@@ -123,7 +123,7 @@ union HOLDREG_U
 		u16 Steps;       //  速度台阶    目前固定 50    Null         6		R/W
 		u16 StepLong;    //  细分			       400 - 50000             7		R/W
 		
-		u16 Distance;       //  长度，夹持距离    Null               8		R/W
+		u16 Distance;       //  长度，夹持距离，实际长度             8		R/W
 		
 		u16 CycleNum;       //  从零点回止距离/ 1000   0.01-9999.9   9		R/W      长度
 		
@@ -210,9 +210,13 @@ BLINK_EXT uint8_t Current_Fre;
 BLINK_EXT uint8_t Target_Fre;   // 目标频率
 BLINK_EXT uint32_t Mark_Pos;    // 加减速转折点
 
+BLINK_EXT	uint8_t led_state;    // led翻转信号
+
+
 //--------------------------------------------------------------------------------
 // FUNCTION
 BLINK_EXT void ControlMove(FunctionalState C);      //
+BLINK_EXT void LEDToggle(void);
 
 #ifdef COLLECT_GLOBALS
 #define COLLECT_EXT
@@ -264,6 +268,8 @@ PRINT_EXT void Uart2_SendChar(uint8_t Ch);
 PRINT_EXT uint16_t MAXSel(uint8_t A,uint8_t C);    // Array  Count
 PRINT_EXT uint16_t MINSel(uint8_t A,uint8_t C);    // Array  Count
 PRINT_EXT uint16_t AVerSel(uint8_t A,uint8_t C);    // Array  Count
+
+PRINT_EXT uint16_t calcCV(void);
 
 
 #ifdef CYCSEND_GLOBALS

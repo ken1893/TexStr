@@ -332,12 +332,41 @@ void Write_SingleHolding()
 				break;
 			
 			case 7:     // œ∏∑÷
-				ZeroMove = (Holding.RegS.CycleNum / LEAD) * Holding.RegS.StepLong * 2;
+			  if(Holding.RegS.Distance != 0)
+				{
+					ZeroMove = ((Holding.RegS.CycleNum - (Holding.RegS.Distance - Holding.RegS.CycleNum))) * Holding.RegS.StepLong * 2  / LEAD;
+				}
+				else 
+				{
+					ZeroMove = ((Holding.RegS.CycleNum)) * Holding.RegS.StepLong * 2  / LEAD;
+				}
 			  startforcetemp = ZeroMove / 100;
 				break;
 			
-			case 9:     // º–≥÷æ‡¿Î
-				ZeroMove = (Holding.RegS.CycleNum / LEAD) * Holding.RegS.StepLong * 2;
+			case 8:     // º–≥÷æ‡¿Î
+				if(Holding.RegS.Distance != 0)
+				{
+					ZeroMove = ((Holding.RegS.CycleNum - (Holding.RegS.Distance - Holding.RegS.CycleNum))) * Holding.RegS.StepLong * 2  / LEAD;
+				}
+				else 
+				{
+					ZeroMove = ((Holding.RegS.CycleNum)) * Holding.RegS.StepLong * 2  / LEAD;
+				}
+				//ZeroMove = ((Holding.RegS.CycleNum - (Holding.RegS.Distance - Holding.RegS.CycleNum)) / LEAD) * Holding.RegS.StepLong * 2;
+			  startforcetemp = ZeroMove / 100;
+				break;
+			
+			case 9:     // ªÿ¡„æ‡¿Î
+				if(Holding.RegS.Distance != 0)
+				{
+					ZeroMove = ((Holding.RegS.CycleNum - (Holding.RegS.Distance - Holding.RegS.CycleNum))) * Holding.RegS.StepLong * 2  / LEAD;
+				}
+				else 
+				{
+					ZeroMove = ((Holding.RegS.CycleNum)) * Holding.RegS.StepLong * 2  / LEAD;
+				}
+				
+				//ZeroMove = ((Holding.RegS.CycleNum - (Holding.RegS.Distance - Holding.RegS.CycleNum)) / LEAD) * Holding.RegS.StepLong * 2;
 			  startforcetemp = ZeroMove / 100;
 				break;
 			

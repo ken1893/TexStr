@@ -63,7 +63,7 @@ static  void    uctsk_COLLECT(void *pdata)
 	
 	Zero_GPIO_Configuration();
 	
-	Flag_Save = 0;
+	Flag_Save = 0;       // 保存参数标志
 	timetemp = 0;
 	
 	sampleCount = 0;       // sample count init
@@ -78,8 +78,16 @@ static  void    uctsk_COLLECT(void *pdata)
 	GuanTimes_Cache = Holding.RegS.GuanTimes;
 	Guan_Cache = Holding.RegS.GuanCount;
 	
-	// 计算夹持长度对应电机运行步数
-	ZeroMove = (Holding.RegS.CycleNum / LEAD) * Holding.RegS.StepLong * 2;
+	// 计算回零距离减夹持长度对应电机运行步数
+	if(Holding.RegS.Distance != 0)
+	{
+		ZeroMove = ((Holding.RegS.CycleNum - (Holding.RegS.Distance - Holding.RegS.CycleNum))) * Holding.RegS.StepLong * 2  / LEAD;
+	}
+	else 
+	{
+		ZeroMove = ((Holding.RegS.CycleNum)) * Holding.RegS.StepLong * 2  / LEAD;
+	}
+	
 	startforcetemp = ZeroMove / 100;
 
 	for(;;){
@@ -112,6 +120,7 @@ static void vHandler_collect(void)
 	if((adcVal & 0x80) == 0)    // 最高位为1采集为负数，数据丢弃 
 	{
 		adcVal = (adcVal << 8) + adcBuf[1];
+		
 		adcVal = adcVal >> 3;     // 变12位
 		
 		Sum_adc = Sum_adc + adcVal - ArrayAdc[sampleCount];  // 更新本次采集结果后的结果和
@@ -146,15 +155,14 @@ static void vHandler_collect(void)
 		if(Result_adcVal > adcMax)
 		{
 			adcMax = Result_adcVal;           // 记录单次最大值
-			DropTemp = (adcMax / 10) * (Holding.RegS.ForceDrop / 10);    // 计算力降
+			
+			// 力降实时更新
+			DropTemp = ((adcMax - Holding.RegS.ZeroScaleAD) / 10) * (Holding.RegS.ForceDrop / 10);    // 计算力降 最大值跌落百分比
 		}
 		else
 		{			
-			// 并且最大车辆值与当前采集值之差需要大于最大允许偏差值
-			// 右移两位，测试结果比最大值跌落25%，判断为测试结束
 			// 力降
-			
-			if((adcMax - Result_adcVal) >= difMax && (adcMax - Result_adcVal) >= DropTemp)  // 大于最小容差并且，力值减小大于力降 
+			if((adcMax - Result_adcVal) >= difMax && (Result_adcVal - Holding.RegS.ZeroScaleAD) < DropTemp)  // 大于最小容差并且，力值减小大于力降 
 			{
 				// 测试结束
 				if(ExamS_Flag == UP)
@@ -182,13 +190,13 @@ static void vHandler_collect(void)
 	        switch(Holding.RegS.Unit)      // 断裂，显示断裂强力，断裂强度，统计信息     Holding.RegS.Standard 单位cn 
 	        {
 		        case Newton:
-			        distemp = distemp * Holding.RegS.Standard * 98 / 1000;
+			        distemp = distemp * Holding.RegS.Standard / 10;
 			        Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
 						  Input.RegS.BreakingTenacity = Input.RegS.BreakingForce / Holding.RegS.TEX;   // 断裂强度
 			        break;
 		
 		        case cNewton:
-			        distemp = distemp * Holding.RegS.Standard * 98 / 10;
+			        distemp = distemp * Holding.RegS.Standard * 10;
 			        Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
 						  Input.RegS.BreakingTenacity = Input.RegS.BreakingForce / Holding.RegS.TEX;   // 断裂强度
 			        break;
@@ -203,13 +211,13 @@ static void vHandler_collect(void)
 			        break;
 						
 						case Mpa:                                                  // 1N = 100cN   N/mm2 = Mpa
-							distemp = distemp * Holding.RegS.Standard * 98 / 100;
+							distemp = distemp * Holding.RegS.Standard ;
 			        Input.RegS.BreakingForce = distemp / strDisSta;          // 断裂强力
 						
 						  // 初始模量
 						  distemp = startforceADtemp - Holding.RegS.ZeroScaleAD;   // 计算中间值
-	            if(distemp >= 60000)distemp = 0;
-						  distemp = distemp * Holding.RegS.Standard * 98 / 10;   // 初始模量
+	            if(distemp >= 65000)distemp = 0;
+						  distemp = distemp * Holding.RegS.Standard * 10;   // 初始模量
 						  Input.RegS.StartForce = distemp / strDisSta;        // 初始模量
 						  
               Mtemp = ((uint32_t)Input.RegS.BreakingForce & 0xffff);
@@ -247,13 +255,16 @@ static void vHandler_collect(void)
 	switch(Holding.RegS.Unit)   // 显示实时值，强力值，拉伸值
 	{
 		case Newton:
-			distemp = distemp * Holding.RegS.Standard * 98 / 1000;
+			distemp = distemp * Holding.RegS.Standard / 10;
 			Input.RegS.Force = distemp / strDisSta;          // 实时强力值
 			break;
 		
 		case cNewton:
-			distemp = distemp * Holding.RegS.Standard * 98 / 10;
+			distemp = distemp * Holding.RegS.Standard * 10;   
 			Input.RegS.Force = distemp / strDisSta;          // 实时强力值
+		
+		  if(Input.RegS.Force < 150)Input.RegS.Force = 0;
+		  if((Input.RegS.Force - Holding.RegS.Standard * 10) < 200 || (Holding.RegS.Standard * 10 - Input.RegS.Force) < 200)Input.RegS.Force = Holding.RegS.Standard * 10;
 			break;
 		
 		case Kilogram:
@@ -265,7 +276,7 @@ static void vHandler_collect(void)
 			break;
 		
 		case Mpa:
-			distemp = distemp * Holding.RegS.Standard * 98 / 10;
+			distemp = distemp * Holding.RegS.Standard * 10;
 			Input.RegS.Force = distemp / strDisSta;          // 实时强力值
 			break;
 	}

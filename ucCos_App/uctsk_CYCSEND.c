@@ -79,6 +79,8 @@ static void uctsk_CYCSEND(void)
 			usartsend_pros();   // 解析完成发送数据
 			
 			pkt_Flag = 0;       // 处理结束
+			
+			LEDToggle();    
 		}
 		
 		OSTimeDlyHMSM(0, 0, 0, 30);	        // 延时50ms

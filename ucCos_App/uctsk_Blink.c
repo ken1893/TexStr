@@ -61,9 +61,7 @@ void  App_BlinkTaskCreate (void)
 //-----------------------------------------------------------------------------------------------------
 static void uctsk_Blink (void) 
 {	
-	uint8_t led_state;
-	led_state = 1;
-	
+
 	allmove = 0;             
 	Action_Flag = WAITING;            // 当前Action标志
 	
@@ -76,17 +74,6 @@ static void uctsk_Blink (void)
 	
    	for(;;)
    	{			
-			if(led_state)
-			{
-				led_state = 0;
-				GPIO_SetBits(GPIOE , GPIO_Pin_13);
-			}
-			else 
-			{
-				led_state = 1; 
-				GPIO_ResetBits(GPIOE , GPIO_Pin_13);
-			}
-
 			// MOVING 运动流程
 			if(Action_Flag != WAITING)
 			{
@@ -147,6 +134,7 @@ static void uctsk_Blink (void)
 								RecordAction = EXAM_START;
 							}
 						}
+						
 						allmove = 0;
 						break;
 					
@@ -189,6 +177,14 @@ static void uctsk_Blink (void)
 				    TIM_SetAutoreload(TIM3, FreTab[0]);
 						GPIO_SetBits(GPIODIRA , DIRPORT);
 						ControlMove(ENABLE);
+					
+						// 测试结束，判断条件
+					  if(Holding.RegS.GuanCount == 0 && Holding.RegS.GuanTimes == 0)
+						{
+							Holding.RegS.GuanTimes = GuanTimes_Cache;
+							Holding.RegS.GuanCount = Guan_Cache;
+						}
+						
 					  RecordAction = EXAM_3;
 						break;
 					
@@ -528,6 +524,20 @@ void Usart2_Init(INT32U baud)
     //nvic_initstruct.NVIC_IRQChannelSubPriority = 0;
     //NVIC_Init(&nvic_initstruct);
 
+}
+
+void LEDToggle(void)
+{
+	if(led_state)
+	{
+				led_state = 0;
+				GPIO_SetBits(GPIOE , GPIO_Pin_13);
+	}
+	else 
+	{
+				led_state = 1; 
+				GPIO_ResetBits(GPIOE , GPIO_Pin_13);
+	}
 }
 
 /**
