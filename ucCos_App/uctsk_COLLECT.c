@@ -6,7 +6,7 @@
                             
 														力值采集，测试结果判断，采集周期100ms
 **--------------------------------------------------------------------------------------------------------
-** Created by:              AVRman
+** Created by:              
 ** Created date:            2019-3-2
 ** Version:                 v1.0
 ** Descriptions:            The original version
